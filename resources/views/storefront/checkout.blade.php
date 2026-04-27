@@ -83,21 +83,51 @@
                         <h2 class="text-[11px] font-black uppercase tracking-[0.4em] mb-10 text-gray-400 italic">Cart Summary</h2>
                         
                         <div class="space-y-6 mb-10 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                            @foreach($products as $product)
+                            @foreach($checkoutItems as $item)
                                 <div class="flex items-center gap-4">
                                     <div class="w-16 h-16 bg-white rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 p-2">
-                                        <img src="{{ $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : 'https://placehold.co/100x100?text=' . urlencode($product->name) }}" class="w-full h-full object-contain mix-blend-multiply" alt="{{ $product->name }}">
+                                        <img src="{{ $item['variant']->product->primaryImage ? asset('storage/' . $item['variant']->product->primaryImage->image_path) : 'https://placehold.co/100x100?text=' . urlencode($item['variant']->product->name) }}" class="w-full h-full object-contain mix-blend-multiply" alt="{{ $item['variant']->product->name }}">
                                     </div>
                                     <div class="flex-1">
-                                        <h4 class="text-[12px] font-black uppercase tracking-tight truncate w-32">{{ $product->name }}</h4>
-                                        <p class="text-[11px] text-gray-400 font-bold">Qty: {{ $cart[$product->id] }}</p>
+                                        <h4 class="text-[12px] font-black uppercase tracking-tight truncate w-32">{{ $item['variant']->product->name }}</h4>
+                                        <p class="text-[11px] text-gray-400 font-bold">Size: {{ $item['variant']->name }} | Qty: {{ $item['quantity'] }}</p>
                                     </div>
-                                    <span class="text-[13px] font-black tracking-tight">RM {{ number_format($product->retail_price * $cart[$product->id], 2) }}</span>
+                                    <span class="text-[13px] font-black tracking-tight">RM {{ number_format($item['subtotal'], 2) }}</span>
                                 </div>
                             @endforeach
                         </div>
 
+                        @auth
+                            <div class="mb-8 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                                        <span class="text-[11px] font-black uppercase tracking-widest text-gray-400">Loyalty Rewards</span>
+                                    </div>
+                                    <span class="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{{ number_format($userPoints) }} pts</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 cursor-pointer group" x-data="{ used: false }">
+                                    <input type="checkbox" name="use_points" value="1" id="use_points" @change="used = !used" class="w-5 h-5 rounded-md border-gray-200 text-black focus:ring-black">
+                                    <label for="use_points" class="text-[13px] font-bold text-gray-700 cursor-pointer select-none">
+                                        Redeem points for discount
+                                        <span x-show="used" class="block text-[10px] text-emerald-600 font-black uppercase mt-0.5 animate-pulse">- RM {{ number_format(min($total * 0.5, $userPoints / 100), 2) }} Applied</span>
+                                    </label>
+                                </div>
+                            </div>
+                        @endauth
+
                         <div class="space-y-4 pt-10 border-t border-gray-100 mb-10">
+                            @if($totalDiscount > 0)
+                                <div class="flex justify-between items-center text-[13px] text-gray-500 font-bold">
+                                    <span>Subtotal</span>
+                                    <span>RM {{ number_format($originalTotal, 2) }}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[13px] font-bold text-red-600">
+                                    <span>Promotional Savings</span>
+                                    <span>- RM {{ number_format($totalDiscount, 2) }}</span>
+                                </div>
+                            @endif
                             <div class="flex justify-between items-center text-[13px] text-gray-500 font-bold">
                                 <span>Shipping Cost</span>
                                 <span class="uppercase tracking-widest text-emerald-600 text-[11px]">Free</span>
@@ -108,7 +138,10 @@
                             </div>
                             <div class="flex justify-between items-baseline pt-4">
                                 <span class="text-lg font-luxury font-black italic">Grand Total</span>
-                                <span class="text-3xl font-black tracking-tighter">RM {{ number_format($total, 2) }}</span>
+                                <div class="text-right">
+                                    <span class="text-3xl font-black tracking-tighter">RM {{ number_format($total, 2) }}</span>
+                                    <p class="text-[10px] text-emerald-600 font-black uppercase tracking-widest mt-1">+{{ floor($total) }} Points Earned</p>
+                                </div>
                             </div>
                         </div>
 

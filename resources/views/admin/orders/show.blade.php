@@ -51,7 +51,9 @@
                                 <tr class="hover:bg-gray-50/60 transition-colors duration-100">
                                     <td class="px-7 py-4.5">
                                         <p class="text-[14px] font-black text-gray-900">{{ $item->product->name }}</p>
-                                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{{ $item->product->sku }} &middot; {{ $item->product->volume_ml }}ml</p>
+                                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                                            {{ $item->product->sku }} &middot; {{ $item->variant?->name ?? $item->product->volume_ml . 'ml' }}
+                                        </p>
                                     </td>
                                     <td class="px-7 py-4.5 text-center">
                                         <span class="inline-flex items-center justify-center min-w-[2rem] px-1.5 h-6 rounded-lg bg-gray-100 border border-gray-200 text-gray-800 text-[12px] font-black shadow-sm">

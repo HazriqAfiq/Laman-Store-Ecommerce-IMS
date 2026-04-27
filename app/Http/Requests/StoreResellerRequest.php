@@ -25,6 +25,7 @@ class StoreResellerRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'commission_rate' => ['required', 'numeric', 'min:0', 'max:100'],
         ];
     }
 }

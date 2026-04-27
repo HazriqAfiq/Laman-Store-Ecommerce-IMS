@@ -17,7 +17,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::withSum('sales', 'quantity')
+        $query = Product::with(['variants'])
+            ->withSum('sales', 'quantity')
             ->withSum('resellerStocks', 'quantity');
 
         // Search by name or SKU
@@ -57,11 +58,11 @@ class ProductController extends Controller
 
         // Summary stats for header
         $totalProducts   = Product::count();
-        $adminStock      = Product::sum('stock');
+        $adminStock      = \App\Models\ProductVariant::sum('stock');
         $resellerStock   = \App\Models\ResellerStock::sum('quantity');
         $totalStock      = $adminStock + $resellerStock;
-        $lowStockCount   = Product::where('stock', '>', 0)->where('stock', '<', 50)->count();
-        $outOfStock      = Product::where('stock', 0)->count();
+        $lowStockCount   = \App\Models\ProductVariant::where('stock', '>', 0)->where('stock', '<', 50)->count();
+        $outOfStock      = \App\Models\ProductVariant::where('stock', 0)->count();
 
         // Available volume options for filter dropdown
         $volumes = Product::distinct()->orderBy('volume_ml')->pluck('volume_ml');
@@ -81,15 +82,34 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create($request->validated());
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $product = Product::create($request->validated());
+            
+            // Handle Variants
+            if ($request->has('variants')) {
+                foreach ($request->input('variants') as $variantData) {
+                    $product->variants()->create([
+                        'name' => $variantData['name'],
+                        'sku' => $variantData['sku'] ?? $product->sku . '-' . $variantData['name'],
+                        'retail_price' => $variantData['retail_price'],
+                        'wholesale_price' => $variantData['wholesale_price'],
+                        'stock' => $variantData['stock'],
+                    ]);
+                }
 
-        if ($product->stock === 0) {
-            NotificationService::outOfStock($product);
-        } elseif ($product->stock < 50) {
-            NotificationService::lowStock($product);
-        }
+                // Update parent stock sum
+                $product->update(['stock' => collect($request->input('variants'))->sum('stock')]);
+            }
 
-        return redirect()->route('admin.products.index')->with('success', 'Product added successfully.');
+            \App\Models\ActivityLog::log(
+                'product_created',
+                $product,
+                "Created new product: {$product->name} with " . (is_array($request->variants) ? count($request->variants) : 0) . " variants",
+                $request->all()
+            );
+
+            return redirect()->route('admin.products.index')->with('success', 'Product and variants added successfully.');
+        });
     }
 
     public function show(Product $product)
@@ -106,22 +126,67 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $oldStock = $product->stock;
-        $product->update($request->validated());
-        $product->refresh();
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $product) {
+            $oldStock = $product->stock;
+            $product->update($request->validated());
 
-        // Fire inventory alerts only when stock transitions into a threshold
-        if ($product->stock === 0 && $oldStock !== 0) {
-            NotificationService::outOfStock($product);
-        } elseif ($product->stock < 50 && $product->stock > 0 && $oldStock >= 50) {
-            NotificationService::lowStock($product);
-        }
+            // Sync Variants
+            if ($request->has('variants')) {
+                $variantIds = [];
+                foreach ($request->input('variants') as $variantData) {
+                    $variant = $product->variants()->updateOrCreate(
+                        ['id' => $variantData['id'] ?? null],
+                        [
+                            'name' => $variantData['name'],
+                            'sku' => $variantData['sku'] ?? $product->sku . '-' . $variantData['name'],
+                            'retail_price' => $variantData['retail_price'],
+                            'wholesale_price' => $variantData['wholesale_price'],
+                            'stock' => $variantData['stock'],
+                        ]
+                    );
+                    $variantIds[] = $variant->id;
+                }
+                // Delete variants not in the request
+                $product->variants()->whereNotIn('id', $variantIds)->delete();
 
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+                // Update parent product fallback fields (optional but good for legacy)
+                if (!empty($request->input('variants'))) {
+                    $first = $request->input('variants')[0];
+                    $product->update([
+                        'retail_price' => $first['retail_price'],
+                        'wholesale_price' => $first['wholesale_price'],
+                        'stock' => collect($request->input('variants'))->sum('stock'),
+                    ]);
+                }
+            }
+
+            $product->refresh();
+
+            \App\Models\ActivityLog::log(
+                'product_updated',
+                $product,
+                "Updated product details and variants for {$product->name}",
+                ['changes' => $request->all()]
+            );
+
+            // Fire inventory alerts (simplified check on total stock for now)
+            $totalStock = $product->variants->sum('stock');
+            if ($totalStock === 0 && $oldStock !== 0) {
+                NotificationService::outOfStock($product);
+            }
+
+            return redirect()->route('admin.products.index')->with('success', 'Product and variants updated successfully.');
+        });
     }
 
     public function destroy(Product $product)
     {
+        \App\Models\ActivityLog::log(
+            'product_deleted',
+            null,
+            "Deleted product: {$product->name} (SKU: {$product->sku})",
+            ['product_id' => $product->id, 'name' => $product->name, 'sku' => $product->sku]
+        );
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted.');
     }

@@ -12,9 +12,13 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', [StorefrontController::class, 'index'])->name('storefront.index');
 Route::get('/collection', [StorefrontController::class, 'collection'])->name('storefront.collection');
 Route::get('/product/{slug}', [StorefrontController::class, 'show'])->name('storefront.show');
+Route::post('/product/{product}/review', [\App\Http\Controllers\ProductReviewController::class, 'store'])->name('product.review')->middleware('auth');
+Route::delete('/product/{product}/review/{review}', [\App\Http\Controllers\ProductReviewController::class, 'destroy'])->name('product.review.destroy')->middleware('auth');
 Route::get('/new-arrivals', [StorefrontController::class, 'newArrivals'])->name('storefront.newArrivals');
 Route::get('/best-sellers', [StorefrontController::class, 'bestSellers'])->name('storefront.bestSellers');
 Route::get('/promotions', [StorefrontController::class, 'promotions'])->name('storefront.promotions');
+Route::get('/scent-finder', [App\Http\Controllers\Storefront\ScentFinderController::class, 'index'])->name('storefront.scent-finder');
+Route::post('/scent-finder/results', [App\Http\Controllers\Storefront\ScentFinderController::class, 'results'])->name('storefront.scent-finder.results');
 
 
 // ── Shopping Cart ────────────────────────────────────────────────────
@@ -22,11 +26,14 @@ Route::get('/cart', [\App\Http\Controllers\CartController::class, 'index'])->nam
 Route::post('/cart/add', [\App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove/{productId}', [\App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/{productId}/wishlist', [\App\Http\Controllers\CartController::class, 'moveToWishlist'])->name('cart.wishlist');
 
 // ── Checkout ─────────────────────────────────────────────────────────
-Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/checkout/success', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+});
 
 
 Route::get('/dashboard', function () {
@@ -51,16 +58,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/sales', [\App\Http\Controllers\SaleController::class, 'index'])->name('sales.index');
     Route::get('/sales/report', [\App\Http\Controllers\SaleController::class, 'report'])->name('sales.report');
     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/export', [\App\Http\Controllers\Admin\OrderController::class, 'export'])->name('orders.export');
     Route::get('/orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+    Route::patch('/orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
     
     // Storefront Settings
     Route::get('/settings/{page?}', [\App\Http\Controllers\Admin\SettingsController::class, 'showPage'])->name('settings.page');
     Route::post('/settings/global-promotion', [\App\Http\Controllers\Admin\SettingsController::class, 'globalPromotion'])->name('settings.globalPromotion');
     Route::post('/settings/{page}', [\App\Http\Controllers\Admin\SettingsController::class, 'updatePage'])->name('settings.page.update');
+    
+    Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
 });
 
 Route::middleware(['auth', 'verified', 'role:reseller'])->prefix('reseller')->name('reseller.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/goal', [\App\Http\Controllers\Reseller\ResellerDashboardController::class, 'updateGoal'])->name('dashboard.goal');
     Route::resource('sales', \App\Http\Controllers\SaleController::class)->only(['index', 'create', 'store']);
     Route::resource('orders', \App\Http\Controllers\Reseller\OrderController::class)->only(['index', 'create', 'store', 'show']);
     Route::get('orders/{order}/payment', [\App\Http\Controllers\Reseller\OrderController::class, 'payment'])->name('orders.payment');
@@ -77,6 +89,9 @@ Route::middleware('auth')->prefix('account')->group(function () {
     Route::post('/addresses', [AccountController::class, 'storeAddress'])->name('account.addresses.store');
     Route::delete('/addresses/{address}', [AccountController::class, 'deleteAddress'])->name('account.addresses.delete');
     Route::get('/settings', [AccountController::class, 'settings'])->name('account.settings');
+    Route::post('/orders/{order}/cancel', [AccountController::class, 'cancelOrder'])->name('account.orders.cancel');
+    Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('account.wishlist');
+    Route::post('/wishlist/toggle/{product}', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 Route::middleware('auth')->group(function () {

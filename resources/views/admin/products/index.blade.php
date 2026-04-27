@@ -278,7 +278,8 @@
                             {{-- Stock Level Progress Bar --}}
                             <td class="px-7 py-4.5">
                                 @php
-                                    $combinedStock = $product->stock + ($product->reseller_stocks_sum_quantity ?? 0);
+                                    $adminStockTotal = $product->variants->sum('stock');
+                                    $combinedStock = $adminStockTotal + ($product->reseller_stocks_sum_quantity ?? 0);
                                     $percent = min(max(($combinedStock / 150) * 100, 5), 100); 
                                     if($combinedStock == 0) $percent = 0;
                                     $barColor = $combinedStock === 0 ? 'bg-red-500' 
@@ -288,9 +289,16 @@
                                 <div class="flex items-center justify-between mb-1.5">
                                     <div class="flex flex-col">
                                         <span class="text-[11px] font-black text-gray-900">{{ number_format($combinedStock) }} <span class="text-gray-400 text-[10px] font-bold">TOTAL</span></span>
-                                        <span class="text-[9px] font-bold text-gray-500 uppercase tracking-tight">
-                                            {{ $product->stock }} Admin &middot; {{ $product->reseller_stocks_sum_quantity ?? 0 }} Reseller
-                                        </span>
+                                        <div class="flex flex-col gap-0.5 mt-1">
+                                            @foreach($product->variants as $v)
+                                                <span class="text-[9px] font-bold text-gray-500 uppercase tracking-tight">
+                                                    {{ $v->name }}: {{ $v->stock }} Admin
+                                                </span>
+                                            @endforeach
+                                            <span class="text-[9px] font-bold text-blue-500 uppercase tracking-tight border-t border-gray-100 mt-1 pt-1">
+                                                Reseller: {{ $product->reseller_stocks_sum_quantity ?? 0 }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden shadow-inner">

@@ -46,6 +46,7 @@ class ResellerController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'reseller',
+            'commission_rate' => $request->commission_rate,
         ]);
 
         NotificationService::newReseller($reseller);
@@ -73,6 +74,7 @@ class ResellerController extends Controller
         if ($request->filled('password')) {
             $reseller->password = Hash::make($request->password);
         }
+        $reseller->commission_rate = $request->commission_rate;
         $reseller->save();
 
         return redirect()->route('admin.resellers.index')->with('success', 'Reseller updated successfully.');

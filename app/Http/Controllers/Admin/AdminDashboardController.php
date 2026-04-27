@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Sale;
 use App\Models\User;
 use Carbon\Carbon;
@@ -39,12 +40,12 @@ class AdminDashboardController extends Controller
         $totalBrandVolume = Sale::sum('total_price');
         
         $totalItemsSold       = Sale::sum('quantity');
-        $adminStock           = Product::sum('stock');
+        $adminStock           = ProductVariant::sum('stock');
         $resellerStock        = \App\Models\ResellerStock::sum('quantity');
         $totalProductsInStock = $adminStock + $resellerStock;
         
-        $totalProducts        = Product::count();
-        $lowStockCount        = Product::where('stock', '<', 50)->count();
+        $totalProducts        = ProductVariant::count();
+        $lowStockCount        = ProductVariant::where('stock', '<', 50)->count();
 
         // Month-over-month total income change
         $thisMonthIncome = \App\Models\Order::where('status', 'paid')
@@ -102,7 +103,7 @@ class AdminDashboardController extends Controller
         $trendUnits          = $days->map(fn($d) => (int)($dailyTotalUnits[$d->toDateString()] ?? 0))->values();
 
         // ── 3. Inventory & SKU Growth (Sparklines) ──────────────────────────
-        $sparkSkus = $days->map(fn($d) => Product::where('created_at', '<=', $d->endOfDay())->count())->slice(-7)->values();
+        $sparkSkus = $days->map(fn($d) => ProductVariant::where('created_at', '<=', $d->endOfDay())->count())->slice(-7)->values();
 
         $currentStockTotal = $totalProductsInStock;
         $sparkStock = $days->map(function($d) use ($currentStockTotal) {
@@ -126,7 +127,7 @@ class AdminDashboardController extends Controller
         $topProducts = Product::withSum('sales', 'quantity')->withSum('sales', 'total_price')->orderByDesc('sales_sum_quantity')->take(5)->get();
         $topResellers = User::where('role', \App\Models\User::ROLE_RESELLER)->withSum('sales', 'total_price')->withSum('sales', 'quantity')->orderByDesc('sales_sum_total_price')->take(5)->get();
 
-        $lowStockProducts = Product::where('stock', '<', 50)->orderBy('stock')->get();
+        $lowStockProducts = ProductVariant::with('product')->where('stock', '<', 50)->orderBy('stock')->get();
         $recentStorefrontSales = Sale::with(['user', 'product'])
             ->where(function($q) {
                 $q->whereNull('user_id')
@@ -158,7 +159,7 @@ class AdminDashboardController extends Controller
             'topProductLabels', 'topProductData', 'topProductRevenueData',
             'topProducts', 'topResellers',
             'lowStockProducts', 'recentStorefrontSales', 'recentResellerSales',
-            'insights', 'sparkRevenue', 'sparkSkus', 'sparkStock'
+            'insights', 'sparkRevenue', 'sparkSkus', 'sparkStock', 'topProductsChart'
         ));
     }
 }

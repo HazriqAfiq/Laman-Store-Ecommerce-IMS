@@ -39,7 +39,7 @@
                                     <div class="flex-1 pt-2">
                                         <div class="flex justify-between mb-2">
                                             <div class="flex flex-col">
-                                                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-400">{{ $item['product']->category }}</span>
+                                                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-400">{{ $item['product']->category?->name }}</span>
                                                 @if($item['product']->isPromotionActive() && $item['product']->promotion_badge)
                                                     <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest mt-1">{{ $item['product']->promotion_badge }}</span>
                                                 @endif
@@ -55,7 +55,7 @@
                                         </div>
                                         <h3 class="text-[16px] font-medium text-gray-900 mb-1 uppercase tracking-[0.1em]">{{ $item['product']->name }}</h3>
                                         <p class="text-[10px] text-gray-400 font-medium capitalize mb-6 flex items-center justify-between">
-                                            <span>{{ $item['product']->volume_ml }}ml</span>
+                                            <span>Size: {{ $item['variant']->name }}</span>
                                             @if($item['free_items'] > 0)
                                                 <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 border border-amber-100/50">+{{ $item['free_items'] }} Free Item(s) Applied</span>
                                             @endif
@@ -65,7 +65,7 @@
                                             <!-- Quantity Update -->
                                             <form action="{{ route('cart.update') }}" method="POST" x-data="{ qty: {{ $item['quantity'] }} }" class="flex items-center gap-4 bg-[#FAFAFA] border border-gray-100 px-4 py-2">
                                                 @csrf
-                                                <input type="hidden" name="product_id" value="{{ $item['product']->id }}">
+                                                <input type="hidden" name="variant_id" value="{{ $item['variant']->id }}">
                                                 <button type="submit" name="quantity" :value="qty - 1" class="text-gray-400 hover:text-black transition-colors">
                                                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
                                                 </button>
@@ -75,8 +75,14 @@
                                                 </button>
                                             </form>
 
+                                            <!-- Save for Later -->
+                                            <form action="{{ route('cart.wishlist', $item['variant']->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="text-[10px] font-bold uppercase tracking-widest text-gray-300 hover:text-blue-600 transition-colors">Save for Later</button>
+                                            </form>
+
                                             <!-- Remove -->
-                                            <form action="{{ route('cart.remove', $item['product']->id) }}" method="POST">
+                                            <form action="{{ route('cart.remove', $item['variant']->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-[10px] font-bold uppercase tracking-widest text-gray-300 hover:text-red-600 transition-colors">Remove</button>

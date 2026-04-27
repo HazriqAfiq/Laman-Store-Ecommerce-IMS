@@ -14,6 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Prata&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>

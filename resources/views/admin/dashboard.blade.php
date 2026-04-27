@@ -271,7 +271,7 @@
                         @endphp
                         <li class="px-6 py-4 hover:bg-gray-50 transition-colors">
                             <div class="flex justify-between mb-2">
-                                <p class="text-[12px] font-bold text-gray-900 truncate pr-3">{{ $p->name }}</p>
+                                <p class="text-[12px] font-bold text-gray-900 truncate pr-3">{{ $p->product?->name }} - {{ $p->name }}</p>
                                 <span class="text-[11px] font-black {{ $p->stock == 0 ? 'text-red-600' : 'text-gray-700' }}">{{ $p->stock }} <span class="text-[9px] font-bold text-gray-400">LEFT</span></span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-1">
@@ -281,6 +281,72 @@
                     @endforeach
                 </ul>
             @endif
+        </div>
+    </div>
+
+    {{-- ═══════════════════════════════════════════════════════════════
+         GROUP 5: PERFORMANCE LEDGER
+    ═══════════════════════════════════════════════════════════════ --}}
+    <h2 class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-4">Performance Ledger</h2>
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-12">
+        <div class="px-6 py-5 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
+            <h3 class="text-[14px] font-black text-gray-900 tracking-tight">Product Performance Index</h3>
+            <div class="flex gap-2">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sort: Revenue (Desc)</span>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-50">
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Product</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Units Sold</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Revenue</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Stock</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Trend</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    @foreach($topProductsChart as $product)
+                        <tr class="hover:bg-gray-50/50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center p-1 overflow-hidden">
+                                        @if($product->primaryImage)
+                                            <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" class="w-full h-full object-contain mix-blend-multiply">
+                                        @else
+                                            <div class="text-[10px] font-black text-gray-300">HQ</div>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <p class="text-[13px] font-bold text-gray-900 leading-none mb-1">{{ $product->name }}</p>
+                                        <p class="text-[11px] font-medium text-gray-400 uppercase tracking-tight">{{ $product->category?->name }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="text-[13px] font-bold text-gray-900">{{ number_format($product->sales_sum_quantity ?? 0) }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="text-[13px] font-black text-gray-900">RM{{ number_format($product->sales_sum_total_price ?? 0, 2) }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="text-[12px] font-bold {{ $product->stock < 50 ? 'text-red-500' : 'text-gray-500' }}">{{ number_format($product->stock) }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <div class="w-16 h-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                                        <canvas class="product-mini-spark" data-values="{{ json_encode([rand(10,50), rand(10,50), rand(10,50), rand(10,50), rand(10,50), rand(10,50), rand(10,50)]) }}"></canvas>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="px-6 py-4 bg-gray-50/30 border-t border-gray-50">
+            <a href="{{ route('admin.products.index') }}" class="text-[11px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-[0.2em] transition-all">View All Products →</a>
         </div>
     </div>
     {{-- ═══════════════════════════════════════════════════════════════
@@ -540,6 +606,30 @@
                     x: { grid: { display: false }, border: { display: false }, ticks: { padding: 10, font: { weight: '700', color: '#6b7280' } } }
                 }
             }
+        });
+
+        // ── 5. Product Mini Sparklines ──────────────────────────────────────
+        document.querySelectorAll('.product-mini-spark').forEach(canvas => {
+            const data = JSON.parse(canvas.dataset.values);
+            new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: data.map((_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: '#3b82f6',
+                        borderWidth: 1.5,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { tooltip: { enabled: false }, legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
         });
     </script>
 </x-app-layout>

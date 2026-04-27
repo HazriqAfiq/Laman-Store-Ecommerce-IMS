@@ -78,51 +78,85 @@
                 </div>
 
                 {{-- ── Pricing, Stock & New Arrival ────────────────── --}}
-                <div>
-                    <h2 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-5 border-b border-gray-100 pb-2">Pricing, Logistics & Marketing</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div>
-                            <label for="volume_ml" class="block text-[13px] font-bold text-gray-700 mb-2">Volume (ml) <span class="text-red-500">*</span></label>
-                            <input id="volume_ml" name="volume_ml" type="number" min="1" value="{{ old('volume_ml', $product->volume_ml) }}"
-                                   class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300
-                                          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 border-gray-200">
-                            @error('volume_ml')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label for="wholesale_price" class="block text-[13px] font-bold text-gray-700 mb-2">Wholesale Price <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[14px] text-gray-400 font-bold">RM</span>
-                                <input id="wholesale_price" name="wholesale_price" type="number" step="0.01" min="0" value="{{ old('wholesale_price', $product->wholesale_price) }}"
-                                       class="w-full pl-11 pr-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300
-                                              focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                                              {{ $errors->has('wholesale_price') ? 'border-red-400' : 'border-gray-200' }}">
+                <div x-data="{ 
+                    variants: {{ $product->variants->map(fn($v) => [
+                        'id' => $v->id,
+                        'name' => $v->name,
+                        'retail_price' => $v->retail_price,
+                        'wholesale_price' => $v->wholesale_price,
+                        'stock' => $v->stock,
+                        'sku' => $v->sku
+                    ])->toJson() }},
+                    addVariant() {
+                        this.variants.push({ id: null, name: '', retail_price: '', wholesale_price: '', stock: 0, sku: '' });
+                    },
+                    removeVariant(index) {
+                        this.variants.splice(index, 1);
+                    }
+                }">
+                    <div class="flex items-center justify-between mb-5 border-b border-gray-100 pb-2">
+                        <h2 class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product Variants (Sizes/Volumes)</h2>
+                        <button type="button" @click="addVariant()" class="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1.5 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            Add Variant
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <template x-for="(variant, index) in variants" :key="index">
+                            <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-6 relative group/variant">
+                                <button type="button" @click="removeVariant(index)" 
+                                        class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/variant:opacity-100 transition-opacity shadow-lg">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+
+                                <input type="hidden" :name="'variants['+index+'][id]'" :value="variant.id">
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                                    <div class="lg:col-span-1">
+                                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Size Name (e.g. 50ml)</label>
+                                        <input type="text" :name="'variants['+index+'][name]'" x-model="variant.name" required
+                                               class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-white border border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">SKU (Suffix)</label>
+                                        <input type="text" :name="'variants['+index+'][sku]'" x-model="variant.sku"
+                                               class="w-full px-4 py-3 text-[14px] font-mono font-medium text-gray-900 bg-white border border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Retail Price (RM)</label>
+                                        <input type="number" step="0.01" :name="'variants['+index+'][retail_price]'" x-model="variant.retail_price" required
+                                               class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-white border border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Wholesale (RM)</label>
+                                        <input type="number" step="0.01" :name="'variants['+index+'][wholesale_price]'" x-model="variant.wholesale_price" required
+                                               class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-white border border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Stock</label>
+                                        <input type="number" :name="'variants['+index+'][stock]'" x-model="variant.stock" required
+                                               class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-white border border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-all">
+                                    </div>
+                                </div>
                             </div>
-                            @error('wholesale_price')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
+                        </template>
+
+                        <div x-show="variants.length === 0" class="py-10 text-center border-2 border-dashed border-gray-100 rounded-3xl">
+                            <p class="text-sm font-medium text-gray-400">No variants added. Click "Add Variant" to begin.</p>
                         </div>
-                        <div>
-                            <label for="retail_price" class="block text-[13px] font-bold text-gray-700 mb-2">Retail Price <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[14px] text-gray-400 font-bold">RM</span>
-                                <input id="retail_price" name="retail_price" type="number" step="0.01" min="0" value="{{ old('retail_price', $product->retail_price) }}"
-                                       class="w-full pl-11 pr-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300
-                                              focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                                              {{ $errors->has('retail_price') ? 'border-red-400' : 'border-gray-200' }}">
-                            </div>
-                            @error('retail_price')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
-                        </div>
-                        <div>
-                            <label for="stock" class="block text-[13px] font-bold text-gray-700 mb-2">Stock Quantity <span class="text-red-500">*</span></label>
-                            <input id="stock" name="stock" type="number" min="0" value="{{ old('stock', $product->stock) }}"
-                                   class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300
-                                          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                                          {{ $errors->has('stock') ? 'border-red-400' : 'border-gray-200' }}">
-                            @error('stock')<p class="mt-1.5 text-xs font-semibold text-red-500">{{ $message }}</p>@enderror
-                        </div>
+                    </div>
+
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="release_date" class="block text-[13px] font-bold text-gray-700 mb-2">Release Date</label>
                             <input id="release_date" name="release_date" type="date" value="{{ old('release_date', $product->release_date ? $product->release_date->format('Y-m-d') : date('Y-m-d')) }}"
-                                   class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300
-                                          focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 border-gray-200">
+                                   class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 border-gray-200">
+                        </div>
+                        <div>
+                            <label for="volume_ml" class="block text-[13px] font-bold text-gray-700 mb-2">Default Volume (Legacy ml) <span class="text-gray-400 font-normal text-[11px]">(display only)</span></label>
+                            <input id="volume_ml" name="volume_ml" type="number" min="1" value="{{ old('volume_ml', $product->volume_ml) }}"
+                                   class="w-full px-4 py-3 text-[14px] font-medium text-gray-500 bg-gray-100/50 border border-gray-200 rounded-xl cursor-not-allowed" readonly>
                         </div>
                     </div>
                 </div>

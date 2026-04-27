@@ -29,6 +29,7 @@ class UpdateResellerRequest extends FormRequest
                 Rule::unique('users')->ignore($this->route('reseller'))
             ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'commission_rate' => ['required', 'numeric', 'min:0', 'max:100'],
         ];
     }
 }

@@ -34,75 +34,68 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @php $counter = 0; @endphp
                 @foreach($products as $product)
-                    <div class="bg-white rounded-3xl border {{ $product->stock === 0 ? 'border-red-100 opacity-75 grayscale-[0.8]' : 'border-gray-100' }} shadow-md shadow-gray-200/40 hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col relative group transform {{ $product->stock > 0 ? 'hover:-translate-y-1' : '' }}">
+                    <div class="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col relative group transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/10">
                         
-                        {{-- Image/Gradient Placeholder --}}
-                        <div class="h-32 bg-gradient-to-br from-blue-50/50 to-white flex items-center justify-center border-b border-gray-50/80 relative overflow-hidden">
-                            <div class="absolute inset-0 bg-blue-600/5 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            
-                            @if($product->stock === 0)
-                                <div class="absolute top-4 right-4 bg-red-50 text-red-600 border border-red-200/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
-                                    Sold Out
-                                </div>
-                            @elseif($product->stock < 50)
-                                <div class="absolute top-4 right-4 bg-amber-50 text-amber-600 border border-amber-200/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_6px_rgba(245,158,11,0.5)]"></span>
-                                    Only {{ $product->stock }} Left
-                                </div>
-                            @else
-                                <div class="absolute top-4 right-4 bg-blue-50 text-blue-600 border border-blue-200/50 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
-                                    {{ $product->stock }} in stock
-                                </div>
-                            @endif
-
-                            <svg class="w-12 h-12 text-blue-200 drop-shadow-sm group-hover:scale-110 transition-transform duration-500 delay-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-                            </svg>
+                        {{-- Product Identity Header --}}
+                        <div class="p-8 bg-gradient-to-br from-gray-50/80 to-white border-b border-gray-50 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-[16px] font-black text-gray-900 tracking-tight">{{ $product->name }}</h3>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{{ $product->sku }}</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-blue-500">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+                            </div>
                         </div>
 
-                        {{-- Details --}}
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="flex justify-between items-start mb-6">
-                                <div class="pr-3 min-w-0 flex-1">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 shadow-sm">{{ $product->volume_ml }}ml &bull; {{ $product->sku }}</p>
-                                    <h3 class="text-[15px] font-black text-gray-900 truncate">{{ $product->name }}</h3>
+                        {{-- Variants List --}}
+                        <div class="p-6 space-y-4">
+                            @foreach($product->variants as $variant)
+                                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100/80 group/variant transition-all hover:bg-white hover:border-blue-100 hover:shadow-sm">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-500">
+                                                {{ $variant->name }}
+                                            </div>
+                                            <div>
+                                                <p class="text-[12px] font-bold text-gray-800">RM{{ number_format($variant->wholesale_price, 2) }}</p>
+                                                <p class="text-[9px] font-bold {{ $variant->stock > 0 ? 'text-emerald-500' : 'text-red-400' }} uppercase tracking-tighter">
+                                                    {{ $variant->stock > 0 ? $variant->stock . ' IN STOCK' : 'SOLD OUT' }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        {{-- Qty Controls --}}
+                                        <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-gray-100 shadow-inner">
+                                            <input type="hidden" name="variant_id[{{ $counter }}]" value="{{ $variant->id }}">
+                                            <input type="hidden" class="product-price" value="{{ $variant->wholesale_price }}">
+                                            
+                                            <button type="button" 
+                                                    class="qty-btn minus w-7 h-7 rounded-lg flex items-center justify-center bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors {{ $variant->stock === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" 
+                                                    {{ $variant->stock === 0 ? 'disabled' : '' }}>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
+                                            </button>
+                                            
+                                            <input type="number" 
+                                                   name="quantity[{{ $counter }}]" 
+                                                   class="qty-input w-10 text-center text-[13px] font-black border-transparent bg-transparent p-0 focus:ring-0 focus:border-transparent text-gray-900" 
+                                                   value="0" 
+                                                   min="0" 
+                                                   max="{{ $variant->stock }}"
+                                                   {{ $variant->stock === 0 ? 'disabled' : '' }}>
+                                                   
+                                            <button type="button" 
+                                                    class="qty-btn plus w-7 h-7 rounded-lg flex items-center justify-center bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors {{ $variant->stock === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" 
+                                                    {{ $variant->stock === 0 ? 'disabled' : '' }}>
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="text-right shrink-0">
-                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unit Price</p>
-                                    <p class="text-[15px] font-black text-blue-600">RM{{ number_format($product->price, 2) }}</p>
-                                    <input type="hidden" class="product-price" value="{{ $product->price }}">
-                                </div>
-                            </div>
-                            
-                            <div class="mt-auto pt-5 border-t border-gray-100/80 flex items-center justify-between">
-                                <span class="text-[11px] font-black text-gray-500 uppercase tracking-widest">Order Qty</span>
-                                
-                                <div class="flex items-center gap-1.5 bg-gray-50/50 p-1 rounded-xl border border-gray-100 shadow-inner">
-                                    <input type="hidden" name="product_id[{{ $loop->index }}]" value="{{ $product->id }}">
-                                    
-                                    <button type="button" 
-                                            class="qty-btn minus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm {{ $product->stock === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" 
-                                            {{ $product->stock === 0 ? 'disabled' : '' }}>
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
-                                    </button>
-                                    
-                                    <input type="number" 
-                                           name="quantity[{{ $loop->index }}]" 
-                                           class="qty-input w-12 text-center text-[13px] font-black border-transparent bg-transparent p-0 focus:ring-0 focus:border-transparent text-gray-900" 
-                                           value="0" 
-                                           min="0" 
-                                           max="{{ $product->stock }}"
-                                           {{ $product->stock === 0 ? 'disabled' : '' }}>
-                                           
-                                    <button type="button" 
-                                            class="qty-btn plus w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm {{ $product->stock === 0 ? 'opacity-50 cursor-not-allowed' : '' }}" 
-                                            {{ $product->stock === 0 ? 'disabled' : '' }}>
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                                    </button>
-                                </div>
-                            </div>
+                                @php $counter++; @endphp
+                            @endforeach
                         </div>
                     </div>
                 @endforeach
@@ -151,8 +144,8 @@
                 inputs.forEach(input => {
                     const qty = parseInt(input.value) || 0;
                     if (qty > 0) {
-                        const row = input.closest('.flex-col');
-                        const unitPrice = parseFloat(row.querySelector('.product-price').value) || 0;
+                        const priceContainer = input.closest('.flex');
+                        const unitPrice = parseFloat(priceContainer.querySelector('.product-price').value) || 0;
                         items += qty;
                         price += (qty * unitPrice);
                     }

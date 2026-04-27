@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class StorefrontController extends Controller
 {
@@ -15,7 +16,7 @@ class StorefrontController extends Controller
     public function index()
     {
         // 0. Settings
-        $settings = Setting::all()->pluck('value', 'key');
+        $settings = $this->loadSettings();
 
         // 1. New Arrivals: Products released in the last 3 months
         $newArrivals = Product::active()
@@ -42,6 +43,14 @@ class StorefrontController extends Controller
     {
         $query = Product::active()->withSum('sales', 'quantity');
 
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         // Filtering by Category (via normalized categories table, filtering by slug)
         if ($category = $request->input('category')) {
             $slugs = explode(',', $category);
@@ -65,6 +74,14 @@ class StorefrontController extends Controller
             });
         }
 
+        // Filtering by Price Range
+        if ($minPrice = $request->input('min_price')) {
+            $query->where('retail_price', '>=', $minPrice);
+        }
+        if ($maxPrice = $request->input('max_price')) {
+            $query->where('retail_price', '<=', $maxPrice);
+        }
+
         // Sorting
         switch ($request->input('sort')) {
             case 'low-high':
@@ -79,7 +96,7 @@ class StorefrontController extends Controller
         }
 
         $products = $query->get();
-        $settings = Setting::all()->pluck('value', 'key');
+        $settings = $this->loadSettings();
 
         return view('storefront.collection', compact('products', 'settings'));
     }
@@ -91,9 +108,12 @@ class StorefrontController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->active()
-            ->with(['images', 'category', 'productType'])
+            ->with(['images', 'category', 'productType', 'reviews.user', 'variants'])
             ->withSum('sales', 'quantity')
             ->firstOrFail();
+        $userReview = auth()->check()
+            ? $product->reviews->firstWhere('user_id', auth()->id())
+            : null;
 
         $relatedProducts = Product::active()
             ->where('category_id', $product->category_id)
@@ -102,7 +122,7 @@ class StorefrontController extends Controller
             ->limit(4)
             ->get();
 
-        return view('storefront.show', compact('product', 'relatedProducts'));
+        return view('storefront.show', compact('product', 'relatedProducts', 'userReview'));
     }
 
     /**
@@ -115,7 +135,7 @@ class StorefrontController extends Controller
             ->where('release_date', '>=', now()->subMonths(3))
             ->latest('release_date')
             ->get();
-        $settings = Setting::all()->pluck('value', 'key');
+        $settings = $this->loadSettings();
         
         $pageTitle = 'New Arrivals';
         $pageSubtitle = 'Recently Unveiled';
@@ -133,7 +153,7 @@ class StorefrontController extends Controller
             ->withSum('sales', 'quantity')
             ->orderByDesc('sales_sum_quantity')
             ->get();
-        $settings = Setting::all()->pluck('value', 'key');
+        $settings = $this->loadSettings();
 
         $pageTitle = 'Best Sellers';
         $pageSubtitle = 'Our Most Celebrated Scents';
@@ -147,7 +167,7 @@ class StorefrontController extends Controller
      */
     public function promotions(Request $request)
     {
-        $settings = Setting::all()->pluck('value', 'key');
+        $settings = $this->loadSettings();
 
         if (($settings['enable_promotions_page'] ?? '1') === '0') {
             abort(404);
@@ -173,5 +193,17 @@ class StorefrontController extends Controller
         $bannerImage = $settings['promotions_hero_image'] ?? null;
 
         return view('storefront.simple-collection', compact('products', 'settings', 'pageTitle', 'pageSubtitle', 'bannerImage'));
+    }
+
+    /**
+     * Load key-value storefront settings safely.
+     */
+    protected function loadSettings()
+    {
+        if (! Schema::hasTable('settings')) {
+            return collect();
+        }
+
+        return Setting::query()->pluck('value', 'key');
     }
 }

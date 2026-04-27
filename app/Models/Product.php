@@ -79,6 +79,11 @@ class Product extends Model
         return $this->hasMany(ResellerStock::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -128,5 +133,20 @@ class Product extends Model
 
         $discount = $this->retail_price * ($this->promotion_value / 100);
         return max(0, $this->retail_price - $discount);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?: 0;
+    }
+
+    public function getReviewCountAttribute()
+    {
+        return $this->reviews()->count();
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 }

@@ -11,18 +11,61 @@
     </div>
 
     {{-- ═══════════════════════════════════════════════════════════════
-         PERFORMANCE INSIGHTS
+         INSIGHTS & GOAL TRACKING
     ═══════════════════════════════════════════════════════════════ --}}
-    @if(count($insights) > 0)
-    <div class="mb-8 bg-violet-50 border border-violet-100 rounded-2xl px-5 py-3.5 flex flex-wrap items-center gap-x-6 gap-y-2 mt-2">
-        @foreach($insights as $insight)
-            <div class="flex items-center gap-2 text-[13px] font-semibold text-violet-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 shadow-[0_0_6px_rgba(167,139,250,0.7)] animate-pulse shrink-0"></span>
-                {{ $insight }}
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+        {{-- Insights --}}
+        <div class="xl:col-span-2 bg-violet-50 border border-violet-100 rounded-3xl p-6">
+            <h3 class="text-[11px] font-black text-violet-400 uppercase tracking-[0.2em] mb-4">Strategic Insights</h3>
+            <div class="space-y-3">
+                @foreach($insights as $insight)
+                    <div class="flex items-start gap-3 text-[13px] font-semibold text-violet-700 leading-snug">
+                        <span class="w-1.5 h-1.5 rounded-full bg-violet-400 shadow-[0_0_6px_rgba(167,139,250,0.7)] mt-1.5 shrink-0"></span>
+                        {{ $insight }}
+                    </div>
+                @endforeach
             </div>
-        @endforeach
+        </div>
+
+        {{-- Monthly Goal --}}
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm shadow-gray-200/40 group relative overflow-hidden" x-data="{ editing: false }">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Monthly Revenue Goal</h3>
+                <button @click="editing = true" class="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest transition-colors opacity-0 group-hover:opacity-100">Adjust</button>
+            </div>
+
+            @if($monthlyGoal > 0)
+                <div class="flex items-end justify-between mb-2">
+                    <p class="text-2xl font-black text-gray-900 tracking-tight">{{ $goalProgress }}% <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-1">Reached</span></p>
+                    <p class="text-[11px] font-bold text-gray-400 tracking-tight">Target: RM{{ number_format($monthlyGoal, 0) }}</p>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden shadow-inner mb-2">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-1000 ease-out" style="width: {{ $goalProgress }}%"></div>
+                </div>
+                <p class="text-[10px] font-medium text-gray-500 leading-tight">RM{{ number_format($thisMonthRevenue, 2) }} earned this month.</p>
+            @else
+                <div class="py-2 text-center">
+                    <p class="text-[13px] font-bold text-gray-900 mb-2">No Goal Set</p>
+                    <button @click="editing = true" class="px-5 py-2 bg-gray-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-black transition-colors">Set Monthly Target</button>
+                </div>
+            @endif
+
+            {{-- Goal Edit Modal/Overlay --}}
+            <div x-show="editing" x-cloak class="absolute inset-0 bg-white/95 backdrop-blur-sm z-20 p-6 flex flex-col justify-center animate-in fade-in zoom-in duration-200">
+                <form action="{{ route('reseller.dashboard.goal') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Set Monthly Revenue Goal (RM)</label>
+                        <input type="number" name="monthly_goal" value="{{ $monthlyGoal }}" class="w-full bg-gray-50 border-gray-100 rounded-xl px-4 py-2.5 text-[14px] font-bold focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-widest py-2.5 rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20">Save</button>
+                        <button type="button" @click="editing = false" class="px-4 bg-gray-100 text-gray-600 text-[11px] font-bold uppercase tracking-widest py-2.5 rounded-xl hover:bg-gray-200 transition-colors">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    @endif
 
     {{-- ═══════════════════════════════════════════════════════════════
          KPI CARDS
@@ -260,6 +303,11 @@
                 <a href="{{ route('reseller.sales.index') }}"
                    class="text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-100/50 px-3 py-2 rounded-xl hover:bg-blue-100 hover:shadow-sm transition-all hidden sm:inline-flex">
                     View Ledger
+                </a>
+                <a href="{{ route('reseller.orders.create') }}"
+                   class="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-3 py-2 rounded-xl hover:bg-emerald-100 hover:shadow-sm transition-all inline-flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    Buy Stock
                 </a>
                 <a href="{{ route('reseller.sales.create') }}"
                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700

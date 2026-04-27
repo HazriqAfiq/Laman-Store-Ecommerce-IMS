@@ -44,7 +44,7 @@ class ResellerDashboardController extends Controller
         $availableProducts = $user->resellerStocks()->where('quantity', '>', 0)->count();
         $lowStockProducts  = $user->resellerStocks()
             ->where('quantity', '>', 0)
-            ->where('quantity', '<=', 5)
+            ->where('quantity', '<=', 10)
             ->with('product')
             ->orderBy('quantity')
             ->get();
@@ -114,6 +114,10 @@ class ResellerDashboardController extends Controller
             ->take(8)
             ->get();
 
+        // ── Goal Progress ──────────────────────────────────────────────────
+        $monthlyGoal = (float) $user->monthly_goal;
+        $goalProgress = $monthlyGoal > 0 ? min(100, round(($thisMonthRevenue / $monthlyGoal) * 100, 1)) : 0;
+
         return view('reseller.dashboard', compact(
             'myTotalRevenue', 'myTotalUnits', 'myTotalSales', 'myCommission',
             'thisMonthRevenue', 'revenueChange', 'commissionChange',
@@ -121,7 +125,14 @@ class ResellerDashboardController extends Controller
             'trendLabels', 'trendRevenue', 'trendUnits',
             'myTopProducts', 'topProductLabels', 'topProductData', 'topProductRev',
             'insights', 'sparkRevenue', 'sparkUnits',
-            'myRecentSales'
+            'myRecentSales', 'monthlyGoal', 'goalProgress'
         ));
+    }
+
+    public function updateGoal(\Illuminate\Http\Request $request)
+    {
+        $request->validate(['monthly_goal' => 'required|numeric|min:0']);
+        auth()->user()->update(['monthly_goal' => $request->monthly_goal]);
+        return back()->with('success', 'Monthly goal updated successfully.');
     }
 }

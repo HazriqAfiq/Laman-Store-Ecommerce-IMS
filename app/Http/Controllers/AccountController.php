@@ -73,4 +73,29 @@ class AccountController extends Controller
         $user = Auth::user();
         return view('account.settings', compact('user'));
     }
+
+    public function cancelOrder(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Only allow cancellation if not already processing/shipped/delivered
+        if (!in_array($order->status, [Order::STATUS_PENDING, Order::STATUS_PAID])) {
+            return back()->with('error', 'This order cannot be cancelled as it is already being processed.');
+        }
+
+        $order->update(['status' => Order::STATUS_CANCELLED]);
+
+        // Restore stock
+        foreach ($order->items as $item) {
+            if ($item->product_variant_id && $item->variant) {
+                $item->variant->increment('stock', $item->quantity);
+            } else {
+                $item->product->increment('stock', $item->quantity);
+            }
+        }
+
+        return back()->with('success', 'Order cancelled successfully. Stock has been restored.');
+    }
 }

@@ -20,38 +20,39 @@ class OrderController extends Controller
 
     public function create()
     {
-        $products = Product::where('stock', '>', 0)->get();
+        $products = Product::active()->with('variants')->get();
         return view('reseller.orders.create', compact('products'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|array',
+            'variant_id' => 'required|array',
             'quantity' => 'required|array',
         ]);
 
-        $products = $request->input('product_id');
+        $variantIds = $request->input('variant_id');
         $quantities = $request->input('quantity');
 
         $totalPrice = 0;
         $orderItems = [];
 
-        foreach ($products as $i => $id) {
+        foreach ($variantIds as $i => $vId) {
             $qty = $quantities[$i] ?? 0;
             if ($qty > 0) {
-                $product = Product::findOrFail($id);
-                if ($product->stock < $qty) {
-                    return back()->withErrors(['quantity' => "Not enough stock for {$product->name}."]);
+                $variant = \App\Models\ProductVariant::with('product')->findOrFail($vId);
+                if ($variant->stock < $qty) {
+                    return back()->withErrors(['quantity' => "Not enough stock for {$variant->product->name} ({$variant->name})."]);
                 }
                 
-                $price = $product->wholesale_price * $qty;
+                $price = $variant->wholesale_price * $qty;
                 $totalPrice += $price;
 
                 $orderItems[] = [
-                    'product_id' => $product->id,
+                    'product_id' => $variant->product_id,
+                    'product_variant_id' => $variant->id,
                     'quantity' => $qty,
-                    'price' => $product->wholesale_price,
+                    'price' => $variant->wholesale_price,
                 ];
             }
         }
@@ -93,21 +94,21 @@ class OrderController extends Controller
         $order->update(['status' => 'paid']);
 
         foreach ($order->items as $item) {
-            $item->product->decrement('stock', $item->quantity);
+            // Decrement Variant Stock
+            if ($item->product_variant_id) {
+                $variant = \App\Models\ProductVariant::find($item->product_variant_id);
+                $variant->decrement('stock', $item->quantity);
+            } else {
+                $item->product->decrement('stock', $item->quantity);
+            }
 
+            // Update Reseller Stock (with variant_id)
             $stock = ResellerStock::firstOrCreate([
                 'user_id' => $order->user_id,
                 'product_id' => $item->product_id,
+                'product_variant_id' => $item->product_variant_id,
             ]);
             $stock->increment('quantity', $item->quantity);
-
-            // Check admin inventory threshold after decrement
-            $freshProduct = $item->product->fresh();
-            if ($freshProduct->stock === 0) {
-                NotificationService::outOfStock($freshProduct);
-            } elseif ($freshProduct->stock < 50) {
-                NotificationService::lowStock($freshProduct);
-            }
         }
 
         // Notify the reseller that their order was approved

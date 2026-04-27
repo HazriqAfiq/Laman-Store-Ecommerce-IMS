@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -13,26 +15,36 @@ class CartController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        $productIds = array_keys($cart);
-        $products = Product::whereIn('id', $productIds)->get();
+
+        // If authenticated and session cart is empty, try loading from DB
+        if (auth()->check() && empty($cart)) {
+            $dbCart = \App\Models\Cart::where('user_id', auth()->id())->first();
+            if ($dbCart) {
+                $cart = $dbCart->content;
+                session()->put('cart', $cart);
+            }
+        }
+
+        $variantIds = array_keys($cart);
+        $variants = \App\Models\ProductVariant::with(['product', 'product.images'])->whereIn('id', $variantIds)->get();
 
         $cartData = [];
         $total = 0;
         $originalTotal = 0;
         $totalDiscount = 0;
 
-        foreach ($products as $product) {
-            $quantity = $cart[$product->id];
-            $basePrice = $product->retail_price;
+        foreach ($variants as $variant) {
+            $quantity = $cart[$variant->id];
+            $basePrice = $variant->retail_price;
             
             $payableQuantity = $quantity;
             $itemDiscountedPrice = $basePrice;
             $freeItems = 0;
 
-            if ($product->isPromotionActive()) {
-                if ($product->promotion_type === 'discount_percent') {
-                    $itemDiscountedPrice = max(0, $basePrice - ($basePrice * ($product->promotion_value / 100)));
-                } elseif ($product->promotion_type === 'bogo') {
+            if ($variant->product->isPromotionActive()) {
+                if ($variant->product->promotion_type === 'discount_percent') {
+                    $itemDiscountedPrice = max(0, $basePrice - ($basePrice * ($variant->product->promotion_value / 100)));
+                } elseif ($variant->product->promotion_type === 'bogo') {
                     $freeItems = floor($quantity / 2);
                     $payableQuantity = $quantity - $freeItems;
                 }
@@ -40,7 +52,7 @@ class CartController extends Controller
 
             $originalSubtotal = $basePrice * $quantity;
             
-            if ($product->isPromotionActive() && $product->promotion_type === 'bogo') {
+            if ($variant->product->isPromotionActive() && $variant->product->promotion_type === 'bogo') {
                 $subtotal = $basePrice * $payableQuantity;
             } else {
                 $subtotal = $itemDiscountedPrice * $quantity;
@@ -53,7 +65,8 @@ class CartController extends Controller
             $totalDiscount += $itemDiscount;
 
             $cartData[] = [
-                'product' => $product,
+                'variant' => $variant,
+                'product' => $variant->product,
                 'quantity' => $quantity,
                 'original_subtotal' => $originalSubtotal,
                 'subtotal' => $subtotal,
@@ -70,24 +83,56 @@ class CartController extends Controller
      */
     public function add(Request $request)
     {
-        $productId = $request->input('product_id');
+        $productId = (int) $request->input('product_id');
+        $variantId = $request->input('variant_id');
         $quantity = (int) $request->input('quantity', 1);
 
-        $product = Product::findOrFail($productId);
-        
-        if ($product->stock < $quantity) {
-            return back()->with('error', 'Not enough stock available.');
+        if ($quantity <= 0) {
+            $quantity = 1;
         }
 
-        $cart = session()->get('cart', []);
+        if ($variantId) {
+            $variant = ProductVariant::with('product')->findOrFail($variantId);
+        } elseif ($productId > 0) {
+            $variant = ProductVariant::with('product')
+                ->where('product_id', $productId)
+                ->orderBy('id')
+                ->first();
 
-        if (isset($cart[$productId])) {
-            $cart[$productId] += $quantity;
+            if (! $variant) {
+                return $request->wantsJson()
+                    ? response()->json(['success' => false, 'message' => 'No variant available for this product.'], 422)
+                    : back()->with('error', 'No variant available for this product.');
+            }
         } else {
-            $cart[$productId] = $quantity;
+            return $request->wantsJson()
+                ? response()->json(['success' => false, 'message' => 'Invalid product or variant selection.'], 422)
+                : back()->with('error', 'Invalid product or variant selection.');
         }
+
+        $variantId = $variant->id;
+        $cart = session()->get('cart', []);
+        $newQuantity = ($cart[$variantId] ?? 0) + $quantity;
+
+        if ($variant->stock < $newQuantity) {
+            $message = "Only {$variant->stock} item(s) available for {$variant->product->name} ({$variant->name}).";
+            return $request->wantsJson()
+                ? response()->json(['success' => false, 'message' => $message], 422)
+                : back()->with('error', $message);
+        }
+
+        // Key by variant_id
+        $cart[$variantId] = $newQuantity;
 
         session()->put('cart', $cart);
+        $this->syncToDatabase($cart);
+
+        ActivityLog::log(
+            'cart_item_added',
+            $variant,
+            'Item added to cart.',
+            ['variant_id' => $variantId, 'quantity' => $quantity, 'cart_quantity' => $newQuantity]
+        );
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -105,17 +150,37 @@ class CartController extends Controller
      */
     public function update(Request $request)
     {
-        $productId = $request->input('product_id');
+        $variantId = $request->input('variant_id');
         $quantity = (int) $request->input('quantity');
 
         if ($quantity <= 0) {
-            return $this->remove($productId);
+            return $this->remove($variantId);
         }
 
         $cart = session()->get('cart', []);
-        if (isset($cart[$productId])) {
-            $cart[$productId] = $quantity;
+        if (isset($cart[$variantId])) {
+            $variant = ProductVariant::with('product')->find($variantId);
+            if (! $variant) {
+                unset($cart[$variantId]);
+                session()->put('cart', $cart);
+                $this->syncToDatabase($cart);
+                return back()->with('error', 'This product variant is no longer available and has been removed from cart.');
+            }
+
+            if ($quantity > $variant->stock) {
+                return back()->with('error', "Only {$variant->stock} item(s) available for {$variant->product->name} ({$variant->name}).");
+            }
+
+            $cart[$variantId] = $quantity;
             session()->put('cart', $cart);
+            $this->syncToDatabase($cart);
+
+            ActivityLog::log(
+                'cart_item_updated',
+                $variant,
+                'Cart item quantity updated.',
+                ['variant_id' => $variantId, 'quantity' => $quantity]
+            );
         }
 
         return back()->with('success', 'Cart updated!');
@@ -124,15 +189,61 @@ class CartController extends Controller
     /**
      * Remove item from cart
      */
-    public function remove($productId)
+    public function remove($variantId)
     {
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
+        if (isset($cart[$variantId])) {
+            $removedQuantity = $cart[$variantId];
+            unset($cart[$variantId]);
             session()->put('cart', $cart);
+            $this->syncToDatabase($cart);
+
+            ActivityLog::log(
+                'cart_item_removed',
+                ProductVariant::find($variantId),
+                'Item removed from cart.',
+                ['variant_id' => $variantId, 'quantity' => $removedQuantity]
+            );
         }
 
         return back()->with('success', 'Item removed from cart.');
+    }
+
+    /**
+     * Move item to wishlist
+     */
+    public function moveToWishlist(Request $request, $variantId)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('info', 'Please login to save items to your wishlist.');
+        }
+
+        $user = auth()->user();
+        $variant = ProductVariant::with('product')->find($variantId);
+        if (! $variant) {
+            return back()->with('error', 'Selected cart item is no longer available.');
+        }
+
+        // Add to wishlist if not already there
+        if (!$user->wishlists()->where('product_id', $variant->product_id)->exists()) {
+            $user->wishlists()->create(['product_id' => $variant->product_id]);
+        }
+
+        // Remove from cart
+        return $this->remove($variantId)->with('success', 'Item moved to wishlist.');
+    }
+
+    /**
+     * Sync cart to database for authenticated users
+     */
+    protected function syncToDatabase($cart)
+    {
+        if (auth()->check()) {
+            \App\Models\Cart::updateOrCreate(
+                ['user_id' => auth()->id()],
+                ['content' => $cart]
+            );
+        }
     }
 }
