@@ -7,13 +7,13 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['title' => 'Point of Sale']); ?>
+<?php $component->withAttributes(['title' => 'Counter Sales']); ?>
     <div x-data="posController()">
         
         <!-- Page Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Point of Sale</h1>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Counter Sales</h1>
                 <p class="text-sm text-gray-500 mt-1">Record direct B2C transactions and update inventory in real-time.</p>
             </div>
             <button @click="$dispatch('open-scanner')" 
