@@ -31,6 +31,13 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php
     $isNew = $product->release_date && $product->release_date >= now()->subMonths(2);
     $isHot = $product->sales_sum_quantity && $product->sales_sum_quantity > 5;
+    
+    $lowStockThreshold = 15;
+
+    
+    $totalStock = $product->variants->sum('stock');
+    $isLowStock = $totalStock > 0 && $totalStock <= $lowStockThreshold;
+    $isOutOfStock = $totalStock <= 0;
 ?>
 
 <a href="<?php echo e(route('storefront.show', $product->slug)); ?>" 
@@ -59,25 +66,34 @@ unset($__defined_vars, $__key, $__value); ?>
             } finally { this.adding = false; }
         }
    }"
-   class="group block transition-transform duration-700 hover:-translate-y-2">
+   class="group block transition-transform duration-700 hover:-translate-y-2 <?php echo e($isOutOfStock ? 'opacity-50 grayscale' : ''); ?>">
 
     <!-- IMAGE -->
     <div class="relative bg-gray-50 mb-3 overflow-hidden rounded-[2rem] border border-transparent group-hover:border-gray-100 shadow-[0_15px_40px_rgba(0,0,0,0.02)] group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700" style="aspect-ratio: 1/1;">
+        
+        <?php if($isOutOfStock): ?>
+            <div class="absolute inset-0 bg-black/40 z-[15] pointer-events-none"></div>
+        <?php endif; ?>
 
         <!-- BADGES -->
         <div class="absolute top-5 left-5 z-10 flex flex-col gap-2 text-left">
             <?php if($isNew): ?>
-                <span class="bg-white/90 backdrop-blur-md text-black text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full shadow-sm">New</span>
+                <span class="bg-black text-white text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full shadow-xl shadow-black/20 border border-white/10">New</span>
             <?php endif; ?>
             <?php if($isHot): ?>
-                <span class="bg-black text-white text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full shadow-lg shadow-black/10">Hot</span>
+                <span class="bg-white text-black text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full shadow-md border border-black/5">Hot</span>
             <?php endif; ?>
         </div>
 
-        <?php if($product->promotion_badge): ?>
+        <?php
+            $currentUser = auth()->user();
+            $effectiveBadge = $product->isPromotionActive(null, $currentUser) ? $product->effective_promotion_badge : null;
+        ?>
+
+        <?php if($effectiveBadge): ?>
             <div class="absolute top-5 right-5 z-10">
-                <span class="bg-amber-400 text-black text-[9px] font-black uppercase tracking-[0.3em] px-4 py-1.5 rounded-full shadow-xl shadow-amber-400/20 border border-amber-500/10">
-                    <?php echo e($product->promotion_badge); ?>
+                <span class="<?php echo e($product->promotion_badge_color ?? 'bg-yellow-500'); ?> <?php echo e(str_contains($product->promotion_badge_color ?? 'yellow', 'yellow') ? 'text-black' : 'text-white'); ?> text-[9px] font-black uppercase tracking-[0.3em] px-4 py-1.5 rounded-full shadow-xl border border-black/5">
+                    <?php echo e($effectiveBadge); ?>
 
                 </span>
             </div>
@@ -196,12 +212,7 @@ unset($__defined_vars, $__key, $__value); ?>
                 </p>
             <?php endif; ?>
 
-            <!-- SOLD -->
-            <?php if($product->sales_sum_quantity > 0): ?>
-                <p class="text-[10px] font-medium text-gray-400 tracking-wider">
-                    <?php echo e($product->sales_sum_quantity); ?>+ Sold
-                </p>
-            <?php endif; ?>
+
 
         </div>
 

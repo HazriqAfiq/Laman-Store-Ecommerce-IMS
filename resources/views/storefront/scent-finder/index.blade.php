@@ -54,7 +54,7 @@
              class="relative h-screen flex flex-col items-center justify-center text-center px-6">
             
             @php
-                $heroImage = \App\Models\Setting::getValue('scent_finder_hero_image', 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=2000');
+                $heroImage = \App\Models\Setting::getValue('scent_finder_hero_image', 'hero/scent-finder-hero.png');
             @endphp
             <div class="absolute inset-0 z-0">
                 <img src="{{ str_contains($heroImage, 'http') ? $heroImage : asset('storage/' . $heroImage) }}" 
@@ -102,13 +102,13 @@
              class="h-screen flex flex-col md:flex-row">
             
             @foreach([
-                ['id' => 'fresh', 'title' => 'Ethereal & Fresh', 'desc' => 'Citrus · Sea Mist · Morning Dew', 'img' => 'https://images.unsplash.com/photo-1502741224143-90386d7f8c82?auto=format&fit=crop&q=80&w=1200'],
-                ['id' => 'woody', 'title' => 'Ancient & Woody', 'desc' => 'Sandalwood · Amber · Midnight Forest', 'img' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=1200'],
-                ['id' => 'floral', 'title' => 'Velvet & Floral', 'desc' => 'Damask Rose · Jasmine · Moonflower', 'img' => 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=1200']
+                ['id' => 'fresh', 'title' => 'Ethereal & Fresh', 'desc' => 'Citrus · Sea Mist · Morning Dew', 'img' => 'scent-finder/vibe-fresh.png'],
+                ['id' => 'woody', 'title' => 'Ancient & Woody', 'desc' => 'Sandalwood · Amber · Midnight Forest', 'img' => 'scent-finder/vibe-woody.png'],
+                ['id' => 'floral', 'title' => 'Velvet & Floral', 'desc' => 'Damask Rose · Jasmine · Moonflower', 'img' => 'scent-finder/vibe-floral.png']
             ] as $vibe)
             <button @click="answers.vibe = '{{ $vibe['id'] }}'; step = 2" 
                     class="group relative flex-1 overflow-hidden flex flex-col items-center justify-center p-12 transition-all duration-500 ease-in-out hover:flex-[1.8]">
-                <img src="{{ $vibe['img'] }}" 
+                <img src="{{ asset('storage/' . $vibe['img']) }}" 
                      class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-700" alt="{{ $vibe['title'] }}">
                 <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
@@ -134,12 +134,12 @@
              class="h-screen flex flex-col md:flex-row">
             
             @foreach([
-                ['id' => 'subtle', 'title' => 'Intimate Whispers', 'desc' => 'Skin Scent · Gentle · Close', 'img' => 'https://images.unsplash.com/photo-1512431151636-67ff70535974?auto=format&fit=crop&q=80&w=1200'],
-                ['id' => 'bold', 'title' => 'Majestic Presence', 'desc' => 'Intense · Radiant · Command', 'img' => 'https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?auto=format&fit=crop&q=80&w=1200']
+                ['id' => 'subtle', 'title' => 'Intimate Whispers', 'desc' => 'Skin Scent · Gentle · Close', 'img' => 'scent-finder/intensity-subtle.png'],
+                ['id' => 'bold', 'title' => 'Majestic Presence', 'desc' => 'Intense · Radiant · Command', 'img' => 'scent-finder/intensity-bold.png']
             ] as $int)
             <button @click="answers.intensity = '{{ $int['id'] }}'; step = 3" 
                     class="group relative flex-1 overflow-hidden flex flex-col items-center justify-center p-12 transition-all duration-500 ease-in-out hover:flex-[1.4]">
-                <img src="{{ $int['img'] }}" 
+                <img src="{{ asset('storage/' . $int['img']) }}" 
                      class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-700" alt="{{ $int['title'] }}">
                 <div class="absolute inset-0 bg-black/50 group-hover:bg-transparent transition-colors duration-500"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
@@ -165,12 +165,12 @@
              class="h-screen flex flex-col md:flex-row">
             
             @foreach([
-                ['id' => 'day', 'title' => 'Daylight Clarity', 'desc' => 'Crisp · Awakening · Professional', 'img' => 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1200'],
-                ['id' => 'night', 'title' => 'Nocturnal Allure', 'desc' => 'Sensual · Deep · Mysterious', 'img' => 'https://images.unsplash.com/photo-1470252649358-96957c053e9a?auto=format&fit=crop&q=80&w=1200']
+                ['id' => 'day', 'title' => 'Daylight Clarity', 'desc' => 'Crisp · Awakening · Professional', 'img' => 'scent-finder/moment-day.png'],
+                ['id' => 'night', 'title' => 'Nocturnal Allure', 'desc' => 'Sensual · Deep · Mysterious', 'img' => 'scent-finder/moment-night.png']
             ] as $time)
             <button @click="answers.time = '{{ $time['id'] }}'; finishJourney()" 
                     class="group relative flex-1 overflow-hidden flex flex-col items-center justify-center p-12 transition-all duration-500 ease-in-out hover:flex-[1.4]">
-                <img src="{{ $time['img'] }}" 
+                <img src="{{ asset('storage/' . $time['img']) }}" 
                      class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-700" alt="{{ $time['title'] }}">
                 <div class="absolute inset-0 bg-black/50 group-hover:bg-transparent transition-colors duration-500"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>

@@ -114,7 +114,22 @@ class ResellerDashboardController extends Controller
             ->take(8)
             ->get();
 
-        // ── Goal Progress ──────────────────────────────────────────────────
+        // ── 5. New Strategic Aggregates ─────────────────────────────────────
+        // Weekly Velocity (Mon-Sun)
+        $weeklyVelocityData = collect(range(0, 6))->map(function($i) use ($user) {
+            return $user->sales()->where(DB::raw("DAYOFWEEK(created_at)"), $i + 1)->count();
+        })->values();
+
+        // Category Distribution
+        $categoryDistribution = DB::table('products')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('sales', 'products.id', '=', 'sales.product_id')
+            ->where('sales.user_id', $user->id)
+            ->select('categories.name', DB::raw('SUM(sales.quantity) as total_qty'))
+            ->groupBy('categories.name')
+            ->pluck('total_qty', 'categories.name');
+
+        // Goal Progress
         $monthlyGoal = (float) $user->monthly_goal;
         $goalProgress = $monthlyGoal > 0 ? min(100, round(($thisMonthRevenue / $monthlyGoal) * 100, 1)) : 0;
 
@@ -125,7 +140,8 @@ class ResellerDashboardController extends Controller
             'trendLabels', 'trendRevenue', 'trendUnits',
             'myTopProducts', 'topProductLabels', 'topProductData', 'topProductRev',
             'insights', 'sparkRevenue', 'sparkUnits',
-            'myRecentSales', 'monthlyGoal', 'goalProgress'
+            'myRecentSales', 'monthlyGoal', 'goalProgress',
+            'weeklyVelocityData', 'categoryDistribution'
         ));
     }
 

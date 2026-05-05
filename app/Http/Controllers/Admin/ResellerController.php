@@ -25,7 +25,11 @@ class ResellerController extends Controller
             });
         }
 
-        $resellers = $query->latest()->paginate(15)->withQueryString();
+        $resellers = $query->latest()->paginate(15)->appends($request->all());
+
+        if ($request->ajax() && !$request->header('X-SPA')) {
+            return view('admin.resellers.partials.table', compact('resellers'))->render();
+        }
 
         $totalResellers = User::where('role', 'reseller')->count();
         $totalSalesCount = \App\Models\Sale::count();

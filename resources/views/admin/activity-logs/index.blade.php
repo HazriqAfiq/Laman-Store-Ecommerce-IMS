@@ -2,81 +2,49 @@
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-xl font-bold text-gray-900 tracking-tight">Activity Ledger</h1>
-            <p class="text-sm font-medium text-gray-500 mt-1">Audit trail for administrative and system-wide actions.</p>
+            <h1 class="text-xl font-black text-gray-900 tracking-tight uppercase">Activity Ledger</h1>
+            <p class="text-[12px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Audit trail for administrative actions</p>
         </div>
     </div>
 
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-200/40 overflow-hidden mb-12">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="bg-gray-50/80 border-b border-gray-100/80">
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Timestamp</th>
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Actor</th>
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Description</th>
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">IP Address</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50/80">
-                    @forelse($logs as $log)
-                        <tr class="hover:bg-gray-50/60 transition-colors duration-100">
-                            <td class="px-7 py-4.5 whitespace-nowrap">
-                                <p class="text-[13px] font-bold text-gray-900">{{ $log->created_at->format('d M Y') }}</p>
-                                <p class="text-[11px] font-medium text-gray-400 uppercase tracking-wider mt-0.5">{{ $log->created_at->format('h:i A') }}</p>
-                            </td>
-                            <td class="px-7 py-4.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-[11px] shrink-0 border border-blue-200/50">
-                                        {{ strtoupper(substr($log->user->name ?? 'SYS', 0, 2)) }}
-                                    </div>
-                                    <div>
-                                        <p class="text-[13px] font-medium text-gray-900">{{ $log->user->name ?? 'System' }}</p>
-                                        <p class="text-[11px] text-gray-400">{{ ucfirst($log->user->role ?? 'N/A') }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-7 py-4.5">
-                                <span class="inline-flex px-2 py-0.5 rounded bg-gray-100 border border-gray-200 text-[10px] font-black text-gray-600 uppercase tracking-widest">
-                                    {{ str_replace('_', ' ', $log->action) }}
-                                </span>
-                            </td>
-                            <td class="px-7 py-4.5">
-                                <p class="text-[13px] font-medium text-gray-700 max-w-md">{{ $log->description }}</p>
-                                @if($log->properties)
-                                    <button x-data="{ open: false }" @click="open = !open" class="mt-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">
-                                        <span x-show="!open">View Payload [+]</span>
-                                        <span x-show="open">Hide Payload [-]</span>
-                                        <pre x-show="open" class="mt-2 p-3 bg-gray-900 text-gray-300 rounded-lg overflow-x-auto text-[10px] leading-relaxed">@json($log->properties, JSON_PRETTY_PRINT)</pre>
-                                    </button>
-                                @endif
-                            </td>
-                            <td class="px-7 py-4.5">
-                                <span class="font-mono text-[11px] text-gray-400">{{ $log->ip_address }}</span>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-7 py-16 text-center">
-                                <div class="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100 shadow-sm">
-                                    <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                    </svg>
-                                </div>
-                                <p class="text-[15px] font-bold text-gray-900 mb-1">No activity logged yet.</p>
-                                <p class="text-[12px] text-gray-500">Events will appear here as admins interact with the system.</p>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        @if($logs->hasPages())
-            <div class="px-7 py-5 border-t border-gray-50/80">
-                {{ $logs->links() }}
+    <div x-data="{ 
+            loading: false,
+            async fetchLogs(url) {
+                this.loading = true;
+                try {
+                    const response = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const html = await response.text();
+                    document.getElementById('table-container').innerHTML = html;
+                    window.history.pushState({}, '', url);
+                } catch (error) {
+                    console.error('Error fetching logs:', error);
+                } finally {
+                    this.loading = false;
+                }
+            }
+         }"
+         @click="if($event.target.closest('.pagination a')) { $event.preventDefault(); fetchLogs($event.target.closest('.pagination a').href); }"
+         class="bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-200/40 overflow-hidden mb-12 relative">
+        
+        <div x-show="loading" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center">
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-10 h-10 border-4 border-slate-600/10 border-t-slate-600 rounded-full animate-spin"></div>
+                <p class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Scanning Trail...</p>
             </div>
-        @endif
+        </div>
+
+        <div id="table-container">
+            @include('admin.activity-logs.partials.table')
+        </div>
     </div>
 
 </x-app-layout>

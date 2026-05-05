@@ -150,6 +150,20 @@ class AdminDashboardController extends Controller
 
         $sparkRevenue = $trendStorefront->slice(-7)->values(); // Default sparkline shows storefront trend
 
+        // ── 5. New Strategic Aggregates ─────────────────────────────────────
+        // Weekly Velocity (Mon-Sun)
+        $weeklyVelocityData = collect(range(0, 6))->map(function($i) {
+            return Sale::where(DB::raw("DAYOFWEEK(created_at)"), $i + 1)->count();
+        })->values();
+
+        // Category Distribution
+        $categoryDistribution = DB::table('products')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('sales', 'products.id', '=', 'sales.product_id')
+            ->select('categories.name', DB::raw('SUM(sales.quantity) as total_qty'))
+            ->groupBy('categories.name')
+            ->pluck('total_qty', 'categories.name');
+
         return view('admin.dashboard', compact(
             'storefrontRevenue', 'wholesaleRevenue', 'totalNetIncome', 'networkVolume', 'totalBrandVolume',
             'totalItemsSold', 'adminStock', 'resellerStock', 'totalProductsInStock',
@@ -159,7 +173,8 @@ class AdminDashboardController extends Controller
             'topProductLabels', 'topProductData', 'topProductRevenueData',
             'topProducts', 'topResellers',
             'lowStockProducts', 'recentStorefrontSales', 'recentResellerSales',
-            'insights', 'sparkRevenue', 'sparkSkus', 'sparkStock', 'topProductsChart'
+            'insights', 'sparkRevenue', 'sparkSkus', 'sparkStock', 'topProductsChart',
+            'weeklyVelocityData', 'categoryDistribution'
         ));
     }
 }

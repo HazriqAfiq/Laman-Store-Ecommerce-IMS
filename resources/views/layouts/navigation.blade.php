@@ -12,34 +12,34 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('reseller.dashboard')">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('reseller.dashboard')" class="text-[11px] font-black uppercase tracking-widest">
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
                     @if(Auth::user()->isAdmin())
-                        <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
+                        <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Products Inventory') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')">
+                        <x-nav-link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Wholesale Orders') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.resellers.index')" :active="request()->routeIs('admin.resellers.*')">
+                        <x-nav-link :href="route('admin.resellers.index')" :active="request()->routeIs('admin.resellers.*')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Manage Resellers') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.sales.index')" :active="request()->routeIs('admin.sales.*')">
+                        <x-nav-link :href="route('admin.sales.index')" :active="request()->routeIs('admin.sales.*')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('B2C Global Sales') }}
                         </x-nav-link>
                     @elseif(Auth::user()->isReseller())
-                        <x-nav-link :href="route('reseller.stock.index')" :active="request()->routeIs('reseller.stock.index')">
+                        <x-nav-link :href="route('reseller.stock.index')" :active="request()->routeIs('reseller.stock.index')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('My Stock') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('reseller.orders.index')" :active="request()->routeIs('reseller.orders.*')">
+                        <x-nav-link :href="route('reseller.orders.index')" :active="request()->routeIs('reseller.orders.*')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Restock / Orders') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('reseller.sales.index')" :active="request()->routeIs('reseller.sales.index')">
+                        <x-nav-link :href="route('reseller.sales.index')" :active="request()->routeIs('reseller.sales.index')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('My Sales History') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('reseller.sales.create')" :active="request()->routeIs('reseller.sales.create')">
+                        <x-nav-link :href="route('reseller.sales.create')" :active="request()->routeIs('reseller.sales.create')" class="text-[11px] font-black uppercase tracking-widest">
                             {{ __('Record New Sale') }}
                         </x-nav-link>
                     @endif

@@ -20,20 +20,33 @@ class StorefrontController extends Controller
 
         // 1. New Arrivals: Products released in the last 3 months
         $newArrivals = Product::active()
+            ->withSum('variants', 'stock')
             ->withSum('sales', 'quantity')
             ->where('release_date', '>=', now()->subMonths(3))
+            ->orderByRaw('variants_sum_stock > 0 DESC')
             ->latest('release_date')
             ->limit(4)
             ->get();
 
         // 2. Best Sellers: Top products by total quantity sold
         $bestSellers = Product::active()
+            ->withSum('variants', 'stock')
             ->withSum('sales', 'quantity')
+            ->orderByRaw('variants_sum_stock > 0 DESC')
             ->orderByDesc('sales_sum_quantity')
             ->limit(4)
             ->get();
 
-        return view('storefront.index', compact('newArrivals', 'bestSellers', 'settings'));
+        // 3. Promotions: Products with active promotions
+        $promotionalItems = Product::active()
+            ->withSum('variants', 'stock')
+            ->withSum('sales', 'quantity')
+            ->onPromotion(auth()->user())
+            ->orderByRaw('variants_sum_stock > 0 DESC')
+            ->limit(4)
+            ->get();
+
+        return view('storefront.index', compact('newArrivals', 'bestSellers', 'promotionalItems', 'settings'));
     }
 
     /**
@@ -83,6 +96,8 @@ class StorefrontController extends Controller
         }
 
         // Sorting
+        $query->withSum('variants', 'stock')->orderByRaw('variants_sum_stock > 0 DESC');
+
         switch ($request->input('sort')) {
             case 'low-high':
                 $query->orderBy('retail_price', 'asc');
@@ -97,6 +112,10 @@ class StorefrontController extends Controller
 
         $products = $query->get();
         $settings = $this->loadSettings();
+
+        if ($request->ajax()) {
+            return view('storefront.partials.products-grid', compact('products'))->render();
+        }
 
         return view('storefront.collection', compact('products', 'settings'));
     }
@@ -118,7 +137,9 @@ class StorefrontController extends Controller
         $relatedProducts = Product::active()
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
+            ->withSum('variants', 'stock')
             ->withSum('sales', 'quantity')
+            ->orderByRaw('variants_sum_stock > 0 DESC')
             ->limit(4)
             ->get();
 
@@ -131,10 +152,17 @@ class StorefrontController extends Controller
     public function newArrivals(Request $request)
     {
         $products = Product::active()
+            ->withSum('variants', 'stock')
             ->withSum('sales', 'quantity')
             ->where('release_date', '>=', now()->subMonths(3))
+            ->orderByRaw('variants_sum_stock > 0 DESC')
             ->latest('release_date')
             ->get();
+
+        if ($request->ajax()) {
+            return view('storefront.partials.products-grid', compact('products'))->render();
+        }
+
         $settings = $this->loadSettings();
         
         $pageTitle = 'New Arrivals';
@@ -150,9 +178,16 @@ class StorefrontController extends Controller
     public function bestSellers(Request $request)
     {
         $products = Product::active()
+            ->withSum('variants', 'stock')
             ->withSum('sales', 'quantity')
+            ->orderByRaw('variants_sum_stock > 0 DESC')
             ->orderByDesc('sales_sum_quantity')
             ->get();
+
+        if ($request->ajax()) {
+            return view('storefront.partials.products-grid', compact('products'))->render();
+        }
+
         $settings = $this->loadSettings();
 
         $pageTitle = 'Best Sellers';
@@ -167,29 +202,26 @@ class StorefrontController extends Controller
      */
     public function promotions(Request $request)
     {
-        $settings = $this->loadSettings();
-
-        if (($settings['enable_promotions_page'] ?? '1') === '0') {
-            abort(404);
+        // Automatically hide page if no active promotions exist
+        if (!Product::hasActivePromotions(auth()->user())) {
+            return redirect()->route('storefront.index');
         }
 
-        $now = now();
         $products = Product::active()
+            ->withSum('variants', 'stock')
             ->withSum('sales', 'quantity')
-            ->whereNotNull('promotion_type')
-            ->where(function ($query) use ($now) {
-                $query->whereNull('promotion_starts_at')
-                      ->orWhere('promotion_starts_at', '<=', $now);
-            })
-            ->where(function ($query) use ($now) {
-                $query->whereNull('promotion_ends_at')
-                      ->orWhere('promotion_ends_at', '>=', $now);
-            })
+            ->onPromotion(auth()->user())
+            ->orderByRaw('variants_sum_stock > 0 DESC')
             ->orderBy('retail_price', 'asc')
             ->get();
 
-        $pageTitle = $settings['promotions_title'] ?? 'Exclusive Promos';
-        $pageSubtitle = $settings['promotions_description'] ?? 'Discover our latest promotional events and seasonal discounts.';
+        if ($request->ajax()) {
+            return view('storefront.partials.products-grid', compact('products'))->render();
+        }
+
+        $settings = $this->loadSettings();
+        $pageTitle = 'Exclusive Promos';
+        $pageSubtitle = 'Discover our latest promotional events and seasonal discounts.';
         $bannerImage = $settings['promotions_hero_image'] ?? null;
 
         return view('storefront.simple-collection', compact('products', 'settings', 'pageTitle', 'pageSubtitle', 'bannerImage'));

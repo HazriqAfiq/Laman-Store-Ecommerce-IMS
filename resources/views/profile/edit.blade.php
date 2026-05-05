@@ -5,76 +5,75 @@
     ═══════════════════════════════════════════ --}}
     <div class="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
-            <h1 class="text-xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage your account information, security, and preferences.</p>
+            <h1 class="text-xl font-black text-gray-900 tracking-tight uppercase">Profile Settings</h1>
+            <p class="text-[12px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Manage account security and preferences</p>
         </div>
         {{-- Role badge --}}
-        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest
-            {{ auth()->user()->isAdmin() ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100' }} self-start sm:self-auto">
-            <span class="w-1.5 h-1.5 rounded-full {{ auth()->user()->isAdmin() ? 'bg-indigo-500' : 'bg-emerald-500' }}"></span>
-            {{ ucfirst(auth()->user()->role) }}
+        <span class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em]
+            {{ auth()->user()->isAdmin() ? 'bg-black text-white shadow-xl shadow-black/10' : 'bg-white text-gray-900 border border-gray-100 shadow-sm' }} self-start sm:self-auto">
+            <span class="w-1.5 h-1.5 rounded-full {{ auth()->user()->isAdmin() ? 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'bg-black' }}"></span>
+            {{ auth()->user()->role }}
         </span>
     </div>
 
     {{-- ═══════════════════════════════════════════
          TWO COLUMN GRID ON LARGE SCREENS
     ═══════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {{-- ── LEFT COLUMN (wider) ─────────────── --}}
-        <div class="lg:col-span-2 space-y-6">
+        <div class="lg:col-span-2 space-y-8">
 
             {{-- Profile Information Card --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100/50 flex items-center justify-center text-blue-600 shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+                <div class="px-8 py-6 border-b border-gray-50 flex items-center gap-4 bg-gray-50/20">
+                    <div class="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shrink-0 shadow-xl shadow-black/10">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-[14px] font-bold text-gray-900">Profile Information</h2>
-                        <p class="text-[11px] font-medium text-gray-400 mt-0.5">Update your name and email address.</p>
+                        <h2 class="text-[14px] font-black text-gray-900 uppercase tracking-[0.2em]">Profile Information</h2>
+                        <p class="text-[11px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Identity & Verification Settings</p>
                     </div>
                 </div>
-                <div class="p-6">
+                <div class="p-8">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
             {{-- Change Password Card --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100/50 flex items-center justify-center text-amber-600 shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+                <div class="px-8 py-6 border-b border-gray-50 flex items-center gap-4 bg-gray-50/20">
+                    <div class="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shrink-0 shadow-xl shadow-black/10">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-[14px] font-bold text-gray-900">Change Password</h2>
-                        <p class="text-[11px] font-medium text-gray-400 mt-0.5">Use a strong, unique password to stay secure.</p>
+                        <h2 class="text-[14px] font-black text-gray-900 uppercase tracking-[0.2em]">Security Access</h2>
+                        <p class="text-[11px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Account Authentication & Encryption</p>
                     </div>
                 </div>
-                <div class="p-6">
+                <div class="p-8">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
             {{-- Danger Zone (resellers only) --}}
             @if(auth()->user()->role === 'reseller')
-                <div class="bg-white rounded-3xl border border-red-100 shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-red-50 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 shrink-0">
-                            <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="bg-white rounded-3xl border border-red-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+                    <div class="px-8 py-6 border-b border-red-50 flex items-center gap-4 bg-red-50/30">
+                        <div class="w-10 h-10 rounded-xl bg-white border border-red-100 flex items-center justify-center text-red-600 shrink-0 shadow-sm">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-[14px] font-bold text-red-700">Danger Zone</h2>
-                            <p class="text-[11px] font-medium text-red-400 mt-0.5">Permanently delete your account and all associated data.</p>
+                            <h2 class="text-[14px] font-black text-red-900 uppercase tracking-[0.2em]">Sensitive Operations</h2>
+                            <p class="text-[11px] font-medium text-red-400 mt-1 uppercase tracking-widest">Irreversible Account Actions</p>
                         </div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-8">
                         @include('profile.partials.delete-user-form')
                     </div>
                 </div>
@@ -83,70 +82,72 @@
         </div>
 
         {{-- ── RIGHT COLUMN (narrower) ──────────── --}}
-        <div class="space-y-6">
+        <div class="space-y-8">
 
             {{-- Account Summary Card --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50">
-                    <h2 class="text-[14px] font-bold text-gray-900">Account Summary</h2>
-                    <p class="text-[11px] font-medium text-gray-400 mt-0.5">Read-only account details.</p>
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-50 bg-gray-50/10">
+                    <h2 class="text-[13px] font-black text-gray-900 uppercase tracking-[0.2em]">Verified Identity</h2>
+                    <p class="text-[10px] font-medium text-gray-400 mt-0.5 uppercase tracking-widest">Real-time status</p>
                 </div>
 
                 {{-- Avatar --}}
-                <div class="px-6 py-5 flex flex-col items-center border-b border-gray-50">
+                <div class="px-6 py-8 flex flex-col items-center border-b border-gray-50 bg-white">
                     <div class="relative group">
-                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-200/60 flex items-center justify-center text-blue-700 font-black text-2xl shadow-sm">
+                        <div class="w-24 h-24 rounded-3xl bg-black flex items-center justify-center text-white font-black text-3xl shadow-2xl shadow-black/20 transition-transform group-hover:scale-105 duration-500">
                             {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                         </div>
-                        <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-green-400 border-2 border-white flex items-center justify-center shadow-sm" title="Active">
-                            <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-white border border-gray-100 flex items-center justify-center shadow-lg" title="Active">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
                         </div>
                     </div>
-                    <p class="mt-3 text-[15px] font-bold text-gray-900">{{ auth()->user()->name }}</p>
-                    <p class="text-[12px] font-medium text-gray-400 mt-0.5">{{ auth()->user()->email }}</p>
+                    <p class="mt-5 text-[17px] font-black text-gray-900 tracking-tight">{{ auth()->user()->name }}</p>
+                    <p class="text-[11px] font-black text-gray-400 mt-1 uppercase tracking-[0.2em]">{{ auth()->user()->role }}</p>
                 </div>
 
                 {{-- Account Details --}}
-                <div class="px-6 py-4 space-y-3.5">
+                <div class="px-8 py-6 space-y-5 bg-white">
                     <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Role</span>
-                        <span class="text-[12px] font-bold text-gray-700 capitalize">{{ auth()->user()->role }}</span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Type</span>
+                        <span class="text-[11px] font-black text-gray-900 uppercase tracking-[0.1em]">{{ auth()->user()->role }}</span>
                     </div>
                     <div class="h-px bg-gray-50"></div>
                     <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Member Since</span>
-                        <span class="text-[12px] font-bold text-gray-700">{{ auth()->user()->created_at->format('d M Y') }}</span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Registration</span>
+                        <span class="text-[11px] font-black text-gray-900 uppercase tracking-[0.1em]">{{ auth()->user()->created_at->format('d M Y') }}</span>
                     </div>
                     <div class="h-px bg-gray-50"></div>
                     <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Status</span>
-                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Active
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Status</span>
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-widest">
+                            <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+                            Verified
                         </span>
                     </div>
+                </div>
+            </div>
                     <div class="h-px bg-gray-50"></div>
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] font-black text-gray-400 uppercase tracking-widest">Email Verified</span>
                         @if(auth()->user()->email_verified_at)
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700">
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <span class="inline-flex items-center gap-1 text-[11px] font-black text-black uppercase tracking-widest">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                 </svg>
                                 Verified
                             </span>
                         @else
-                            <span class="text-[11px] font-bold text-amber-600">Unverified</span>
+                            <span class="text-[11px] font-black text-amber-600 uppercase tracking-widest">Unverified</span>
                         @endif
                     </div>
                 </div>
             </div>
 
             {{-- Notification Preferences Card --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50">
-                    <h2 class="text-[14px] font-bold text-gray-900">Notifications</h2>
-                    <p class="text-[11px] font-medium text-gray-400 mt-0.5">Choose what you're alerted about.</p>
+                    <h2 class="text-[14px] font-black text-gray-900 uppercase tracking-[0.1em]">Notifications</h2>
+                    <p class="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-widest">System and alert preferences</p>
                 </div>
                 <div class="px-6 py-4 space-y-4">
                     {{-- Toggle: Low Stock --}}
@@ -155,9 +156,9 @@
                             <p class="text-[13px] font-bold text-gray-800">Low Stock Alerts</p>
                             <p class="text-[11px] font-medium text-gray-400">Notify when stock is critical.</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 group">
                             <input type="checkbox" checked class="sr-only peer">
-                            <div class="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-4 after:h-4 after:transition-all"></div>
+                            <div class="w-12 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-4 after:w-4 after:transition-all duration-500 peer-checked:bg-black shadow-inner"></div>
                         </label>
                     </div>
                     <div class="h-px bg-gray-50"></div>
@@ -167,9 +168,9 @@
                             <p class="text-[13px] font-bold text-gray-800">Sales Recorded</p>
                             <p class="text-[11px] font-medium text-gray-400">Alerts for every new sale.</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 group">
                             <input type="checkbox" class="sr-only peer">
-                            <div class="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-4 after:h-4 after:transition-all"></div>
+                            <div class="w-12 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-4 after:w-4 after:transition-all duration-500 peer-checked:bg-black shadow-inner"></div>
                         </label>
                     </div>
                     <div class="h-px bg-gray-50"></div>
@@ -179,9 +180,9 @@
                             <p class="text-[13px] font-bold text-gray-800">Order Updates</p>
                             <p class="text-[11px] font-medium text-gray-400">Status changes on wholesale orders.</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 group">
                             <input type="checkbox" checked class="sr-only peer">
-                            <div class="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-4 after:h-4 after:transition-all"></div>
+                            <div class="w-12 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-4 after:w-4 after:transition-all duration-500 peer-checked:bg-black shadow-inner"></div>
                         </label>
                     </div>
                     <div class="h-px bg-gray-50"></div>
@@ -191,9 +192,9 @@
                             <p class="text-[13px] font-bold text-gray-800">Email Notifications</p>
                             <p class="text-[11px] font-medium text-gray-400">Receive alerts via email.</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 group">
                             <input type="checkbox" class="sr-only peer">
-                            <div class="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-5 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-4 after:h-4 after:transition-all"></div>
+                            <div class="w-12 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-200 after:border after:rounded-full after:h-4 after:w-4 after:transition-all duration-500 peer-checked:bg-black shadow-inner"></div>
                         </label>
                     </div>
                     <div class="pt-1">

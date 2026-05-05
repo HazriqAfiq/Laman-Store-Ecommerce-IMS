@@ -34,11 +34,6 @@ class StoreProductRequest extends FormRequest
             'stock'           => ['nullable', 'integer', 'min:0'],
             'release_date'    => ['nullable', 'date'],
             'is_active'       => ['nullable', 'boolean'],
-            'promotion_type'      => ['nullable', 'string', 'in:discount_percent,bogo'],
-            'promotion_value'     => ['nullable', 'integer', 'min:1', 'max:100'],
-            'promotion_badge'     => ['nullable', 'string', 'max:50'],
-            'promotion_starts_at' => ['nullable', 'date'],
-            'promotion_ends_at'   => ['nullable', 'date', 'after_or_equal:promotion_starts_at'],
             'images'              => ['nullable', 'array'],
             'images.*'            => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];

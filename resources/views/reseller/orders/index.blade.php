@@ -3,23 +3,23 @@
     {{-- HEADER --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-xl font-bold text-gray-900 tracking-tight">Wholesale Orders</h1>
-            <p class="text-sm font-medium text-gray-500 mt-1">Your past stock purchases from HQ</p>
+            <h1 class="text-xl font-black text-gray-900 tracking-tight uppercase">Wholesale Orders</h1>
+            <p class="text-[12px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Past stock purchases from HQ</p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
             <a href="{{ route('reseller.orders.create') }}"
-               class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700
-                      text-white text-[13px] font-bold rounded-xl shadow-md shadow-blue-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+               class="inline-flex items-center gap-1.5 px-6 py-2.5 bg-black hover:bg-gray-900
+                      text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-black/10 transition-all duration-300 hover:-translate-y-0.5">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                 </svg>
-                Restock Inventory
+                <span>Restock Inventory</span>
             </a>
         </div>
     </div>
 
     {{-- TABLE --}}
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-200/40 overflow-hidden mb-12">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mb-12">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
@@ -63,13 +63,13 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-7 py-4.5 text-right">
-                                <a href="{{ route('reseller.orders.show', $order) }}"
-                                   class="inline-flex items-center gap-1.5 px-4 py-2 text-[12px] font-bold text-gray-600
-                                          bg-white border border-gray-200 hover:bg-gray-50 rounded-xl transition-all duration-300 hover:shadow-sm">
-                                    View Details
-                                </a>
-                            </td>
+                             <td class="px-7 py-4.5 text-right">
+                                 <a href="{{ route('reseller.orders.show', $order) }}"
+                                    class="inline-flex items-center gap-1.5 px-6 py-2 text-[11px] font-black uppercase tracking-widest text-gray-400
+                                           hover:text-black bg-white border border-gray-100 hover:bg-gray-50 rounded-xl transition-all duration-200 shadow-sm">
+                                     Details
+                                 </a>
+                             </td>
                         </tr>
                     @empty
                         <tr>

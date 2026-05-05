@@ -115,8 +115,8 @@
                                         <div class="flex justify-between items-start mb-4">
                                             <div class="flex flex-col gap-1.5">
                                                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{{ $item['product']->category?->name }}</span>
-                                                @if($item['product']->isPromotionActive() && $item['product']->promotion_badge)
-                                                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.2em] px-2 py-0.5 bg-emerald-50 rounded-md inline-block w-fit">{{ $item['product']->promotion_badge }}</span>
+                                                @if($item['product']->effective_promotion_badge)
+                                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] px-2 py-0.5 bg-amber-400 text-black rounded shadow-sm inline-block w-fit">{{ $item['product']->effective_promotion_badge }}</span>
                                                 @endif
                                             </div>
                                             <div class="text-right">

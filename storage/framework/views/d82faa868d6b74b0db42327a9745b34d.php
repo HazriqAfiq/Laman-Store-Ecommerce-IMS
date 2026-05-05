@@ -36,10 +36,34 @@ unset($__defined_vars, $__key, $__value); ?>
 
     <title><?php echo e($title ?? config('app.name', 'Laman Store')); ?> | Laman Store Malaysia</title>
 
-    <!-- Fonts: Premium Serif & Clean Sans -->
+    <?php
+        $typography = \App\Models\Setting::getValue('theme_typography_pairing', 'classic');
+        $heroScrim = \App\Models\Setting::getValue('homepage_hero_scrim', '0.3');
+        
+
+        $fontLinks = [
+            'classic' => 'family=Prata&family=Inter:wght@400;500;600;700;800;900',
+            'editorial' => 'family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@400;500;600;700;800;900',
+            'minimal' => 'family=Tenor+Sans&family=Outfit:wght@400;500;600;700;800;900'
+        ];
+        
+        $fontSerif = [
+            'classic' => '"Prata", serif',
+            'editorial' => '"Playfair Display", serif',
+            'minimal' => '"Tenor Sans", serif'
+        ];
+        
+        $fontSans = [
+            'classic' => '"Inter", sans-serif',
+            'editorial' => '"Montserrat", sans-serif',
+            'minimal' => '"Outfit", sans-serif'
+        ];
+    ?>
+
+    <!-- Fonts: Dynamic Premium Pairings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prata&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?<?php echo e($fontLinks[$typography] ?? $fontLinks['classic']); ?>&display=swap" rel="stylesheet">
 
     <!-- CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -49,14 +73,27 @@ unset($__defined_vars, $__key, $__value); ?>
     <style>
         [x-cloak] { display: none !important; }
         :root {
-            --font-serif: "Prata", serif;
-            --font-sans: 'Inter', sans-serif;
+            --font-serif: <?php echo $fontSerif[$typography] ?? $fontSerif['classic']; ?>;
+            --font-sans: <?php echo $fontSans[$typography] ?? $fontSans['classic']; ?>;
+            --hero-scrim-opacity: <?php echo e($heroScrim); ?>;
         }
         .font-luxury { font-family: var(--font-serif); }
         body { 
             font-family: var(--font-sans);
             letter-spacing: -0.01em;
         }
+        .bg-accent { background-color: #000; }
+        .text-accent { color: #000; }
+        .border-accent { border-color: #000; }
+        .shadow-accent { --tw-shadow-color: rgba(0,0,0,0.1); }
+
+        .hero-scrim {
+            position: absolute;
+            inset: 0;
+            background-color: black;
+            opacity: var(--hero-scrim-opacity);
+        }
+
         .glass-nav {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
@@ -185,10 +222,37 @@ unset($__defined_vars, $__key, $__value); ?>
       ">
 
     <!-- ── HEADER ───────────────────────────────────────────────────────── -->
-    <header class="fixed w-full top-0 z-50 <?php echo e($isMenuPage ? 'transition-all duration-300 ease-in-out' : ''); ?>">
-        <!-- Announcement Bar -->
-        <?php $announcementEnabled = \App\Models\Setting::getValue('announcement_bar_enabled', '0') === '1'; ?>
-        <?php if($announcementEnabled): ?>
+    <?php 
+        $announcementEnabled = \App\Models\Setting::getValue('announcement_bar_enabled', '0') === '1';
+        $announcementSticky = \App\Models\Setting::getValue('announcement_bar_sticky', '0') === '1';
+    ?>
+
+    <?php if($announcementEnabled && !$announcementSticky): ?>
+        <div class="bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase text-center py-2.5 relative w-full z-[60]">
+            <?php echo e(\App\Models\Setting::getValue('announcement_bar_text', '')); ?>
+
+        </div>
+    <?php endif; ?>
+
+    <header x-data="{ 
+                mobileMenu: false, 
+                scrolled: false, 
+                cartCount: <?php echo e(array_sum(session('cart', []))); ?>,
+                searchOpen: false 
+             }"
+            x-init="
+                $watch('searchOpen', value => { 
+                    if(value) { 
+                        setTimeout(() => $refs.searchInput.focus(), 100); 
+                    } 
+                });
+            "
+            @scroll.window="scrolled = (window.pageYOffset > 20)"
+            @cart-updated.window="cartCount = $event.detail.count"
+            class="fixed w-full z-50 <?php echo e($isMenuPage ? 'transition-all duration-300 ease-in-out' : ''); ?>"
+            :style="(scrolled || !<?php echo json_encode($announcementEnabled, 15, 512) ?> || <?php echo json_encode($announcementSticky, 15, 512) ?>) ? 'top: 0' : 'top: 40px'">
+        
+        <?php if($announcementEnabled && $announcementSticky): ?>
             <div class="bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase text-center py-2.5 relative w-full z-[60]">
                 <?php echo e(\App\Models\Setting::getValue('announcement_bar_text', '')); ?>
 
@@ -196,22 +260,7 @@ unset($__defined_vars, $__key, $__value); ?>
         <?php endif; ?>
 
         <!-- Navigation -->
-        <nav x-data="{ 
-                mobileMenu: false, 
-                scrolled: false, 
-                cartCount: <?php echo e(array_sum(session('cart', []))); ?>,
-                searchOpen: false 
-             }"          
-              x-init="
-                $watch('searchOpen', value => { 
-                    if(value) { 
-                        setTimeout(() => $refs.searchInput.focus(), 100); 
-                    } 
-                });
-              "
-              @scroll.window="scrolled = (window.pageYOffset > 50)"
-              @cart-updated.window="cartCount = $event.detail.count"
-              :class="{ 
+        <nav :class="{ 
                 'bg-white border-b border-gray-100 py-4 shadow-sm': scrolled || !<?php echo json_encode($isMenuPage, 15, 512) ?>, 
                 'bg-transparent py-4': !scrolled && <?php echo json_encode($isMenuPage, 15, 512) ?>
               }"
@@ -258,7 +307,8 @@ unset($__defined_vars, $__key, $__value); ?>
                             ['route' => 'storefront.bestSellers', 'label' => 'Best Sellers'],
                             ['route' => 'storefront.scent-finder', 'label' => 'Scent Finder'],
                         ];
-                        if (\App\Models\Setting::getValue('enable_promotions_page', '1') === '1') {
+                        // Automated Promotions Page: Only show if active promotions exist
+                        if (\App\Models\Product::hasActivePromotions(Auth::user())) {
                             $navItems[] = ['route' => 'storefront.promotions', 'label' => 'Promotions'];
                         }
                     ?>
@@ -461,15 +511,10 @@ unset($__defined_vars, $__key, $__value); ?>
                         <span class="font-luxury text-2xl font-black tracking-tight text-gray-900"><?php echo e(\App\Models\Setting::getValue('brand_name', 'Laman Store')); ?></span>
                     </div>
                     <p class="text-[15px] text-gray-500 font-medium leading-relaxed mb-10">
-                        Join our exclusive circle for early access to limited collections, sanctuary updates, and the art of fine fragrance.
+                        <?php echo e(\App\Models\Setting::getValue('footer_story', 'Join our exclusive circle for early access to limited collections, sanctuary updates, and the art of fine fragrance.')); ?>
+
                     </p>
-                    <form @submit.prevent="alert('Welcome to the sanctuary!')" class="relative max-w-sm group">
-                        <input type="email" placeholder="Email Address" 
-                               class="w-full bg-transparent border-0 border-b border-gray-200 focus:ring-0 focus:border-black py-4 px-0 text-[15px] font-bold placeholder-gray-200 transition-all">
-                        <button class="absolute right-0 top-1/2 -translate-y-1/2 p-2 group-hover:translate-x-1 transition-transform">
-                            <svg class="w-6 h-6 text-gray-300 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                        </button>
-                    </form>
+
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-20 gap-y-12">
@@ -496,10 +541,9 @@ unset($__defined_vars, $__key, $__value); ?>
                     <div class="reveal reveal-delay-300">
                         <h4 class="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 mb-8">Service</h4>
                         <ul class="space-y-4">
-                            <li><a href="#" class="text-[14px] text-gray-600 hover:text-black font-bold transition-colors">Shipping</a></li>
-                            <li><a href="#" class="text-[14px] text-gray-600 hover:text-black font-bold transition-colors">Exchanges</a></li>
+                            <li><a href="https://wa.me/<?php echo e(preg_replace('/[^0-9]/', '', \App\Models\Setting::getValue('contact_whatsapp', ''))); ?>" class="text-[14px] text-gray-600 hover:text-black font-bold transition-colors">WhatsApp Us</a></li>
+                            <li><a href="mailto:<?php echo e(\App\Models\Setting::getValue('contact_email', '')); ?>" class="text-[14px] text-gray-600 hover:text-black font-bold transition-colors">Concierge Email</a></li>
                             <li><a href="#" class="text-[14px] text-gray-600 hover:text-black font-bold transition-colors">Privacy</a></li>
-                            <li><a href="#" class="text-[14px] text-gray-600 hover:text-black font-bold transition-colors">Contact</a></li>
                         </ul>
                     </div>
                 </div>
@@ -520,7 +564,8 @@ unset($__defined_vars, $__key, $__value); ?>
                 </div>
                 
                 <p class="text-[11px] text-gray-400 font-medium tracking-wide">
-                    &copy; <?php echo e(date('Y')); ?> <?php echo e(\App\Models\Setting::getValue('brand_name', 'Laman Store')); ?> Malaysia. All rights reserved.
+                    <?php echo e(\App\Models\Setting::getValue('copyright_text', '© ' . date('Y') . ' ' . \App\Models\Setting::getValue('brand_name', 'Laman Store') . ' Malaysia. All rights reserved.')); ?>
+
                 </p>
             </div>
         </div>
@@ -537,6 +582,8 @@ unset($__defined_vars, $__key, $__value); ?>
             <span class="text-[13px] font-black tracking-wide uppercase"><?php echo e(session('success')); ?></span>
         </div>
     <?php endif; ?>
+
+
 
 </body>
 </html>

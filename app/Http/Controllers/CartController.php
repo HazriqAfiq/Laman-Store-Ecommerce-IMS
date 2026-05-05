@@ -40,8 +40,10 @@ class CartController extends Controller
             $payableQuantity = $quantity;
             $itemDiscountedPrice = $basePrice;
             $freeItems = 0;
+            
+            $user = auth()->user(); // Will be null for guests
 
-            if ($variant->product->isPromotionActive()) {
+            if ($variant->product->isPromotionActive($quantity, $user)) {
                 if ($variant->product->promotion_type === 'discount_percent') {
                     $itemDiscountedPrice = max(0, $basePrice - ($basePrice * ($variant->product->promotion_value / 100)));
                 } elseif ($variant->product->promotion_type === 'bogo') {
@@ -52,7 +54,7 @@ class CartController extends Controller
 
             $originalSubtotal = $basePrice * $quantity;
             
-            if ($variant->product->isPromotionActive() && $variant->product->promotion_type === 'bogo') {
+            if ($variant->product->isPromotionActive($quantity, $user) && $variant->product->promotion_type === 'bogo') {
                 $subtotal = $basePrice * $payableQuantity;
             } else {
                 $subtotal = $itemDiscountedPrice * $quantity;

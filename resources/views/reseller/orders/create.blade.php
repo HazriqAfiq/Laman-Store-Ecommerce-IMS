@@ -1,18 +1,24 @@
 <x-app-layout title="Order Stock from Admin">
 
-    <div class="max-w-5xl mx-auto pb-32">
+    <div class="max-w-full pb-32">
         {{-- Header --}}
         <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
             <div>
-                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Order Wholesale Stock</h1>
-                <p class="text-sm font-medium text-gray-500 mt-1">Browse the global catalog and purchase raw stock from HQ immediately.</p>
+                <h1 class="text-xl font-black text-gray-900 tracking-tight uppercase">Order Wholesale Stock</h1>
+                <p class="text-[12px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Purchase raw stock from HQ immediately</p>
             </div>
-            <a href="{{ route('reseller.orders.index') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 hover:bg-blue-50 text-[13px] font-bold rounded-xl transition-all duration-300 shadow-sm hover:-translate-y-0.5 hover:shadow-md group">
-                Purchase History
-                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-            </a>
+            <div class="flex items-center gap-3">
+                <button type="button" @click="$dispatch('open-scanner')" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 text-[13px] font-bold rounded-xl transition-all duration-300 shadow-sm hover:-translate-y-0.5 hover:shadow-md">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                    Scan to Add
+                </button>
+                <a href="{{ route('reseller.orders.index') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 hover:bg-blue-50 text-[13px] font-bold rounded-xl transition-all duration-300 shadow-sm hover:-translate-y-0.5 hover:shadow-md group">
+                    History
+                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
         </div>
 
         <form id="order-form" action="{{ route('reseller.orders.store') }}" method="POST" class="needs-validation">
@@ -81,6 +87,7 @@
                                             <input type="number" 
                                                    name="quantity[{{ $counter }}]" 
                                                    class="qty-input w-10 text-center text-[13px] font-black border-transparent bg-transparent p-0 focus:ring-0 focus:border-transparent text-gray-900" 
+                                                   data-sku="{{ $variant->sku ?? $product->sku }}"
                                                    value="0" 
                                                    min="0" 
                                                    max="{{ $variant->stock }}"
@@ -129,6 +136,8 @@
             
         </form>
     </div>
+    
+    <x-scanner-modal target-event="order-barcode-scanned" />
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -193,6 +202,41 @@
                     if (val > max) input.value = max;
                     updateCart();
                 });
+            });
+
+            // Scanner Event Listener
+            window.addEventListener('order-barcode-scanned', (e) => {
+                const sku = e.detail.sku;
+                let found = false;
+                
+                inputs.forEach(input => {
+                    if (input.dataset.sku === sku) {
+                        found = true;
+                        if (!input.disabled) {
+                            const max = parseInt(input.max) || 0;
+                            let val = parseInt(input.value) || 0;
+                            if (val < max) {
+                                input.value = val + 1;
+                                updateCart();
+                                // Highlight the matched product container briefly
+                                const container = input.closest('.bg-gray-50\\/50');
+                                if (container) {
+                                    container.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50/50');
+                                    setTimeout(() => container.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50/50'), 1000);
+                                    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            } else {
+                                alert(`Maximum stock (${max}) reached for this item.`);
+                            }
+                        } else {
+                            alert("This item is currently out of stock.");
+                        }
+                    }
+                });
+                
+                if (!found) {
+                    alert("Scanned product not found in the catalog.");
+                }
             });
         });
     </script>

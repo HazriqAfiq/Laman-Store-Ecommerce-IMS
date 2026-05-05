@@ -65,50 +65,45 @@
         </header>
 
         <div class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-16">
-            <!-- ── REFINED TOP BAR ────────────────────────── -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-16 pb-8 border-b border-gray-100 gap-8">
-                <div class="flex items-center gap-12">
-                     <p class="text-[13px] font-black uppercase tracking-widest text-black"><?php echo e($pageTitle ?? 'Collection'); ?></p>
+            <div x-data="{ 
+                loading: false,
+                async fetchProducts(url) {
+                    this.loading = true;
+                    try {
+                        const response = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        const html = await response.text();
+                        document.getElementById('products-container').innerHTML = html;
+                        window.history.pushState({}, '', url);
+                        window.scrollTo({ top: document.getElementById('products-container').offsetTop - 150, behavior: 'smooth' });
+                    } catch (error) {
+                        console.error('Error fetching products:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }" @click="if($event.target.closest('.ajax-link')) { $event.preventDefault(); fetchProducts($event.target.closest('.ajax-link').href); }">
+                
+                <!-- ── REFINED TOP BAR ────────────────────────── -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-16 pb-8 border-b border-gray-100 gap-8">
+                    <div class="flex items-center gap-12">
+                         <p class="text-[13px] font-black uppercase tracking-widest text-black"><?php echo e($pageTitle ?? 'Collection'); ?></p>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-12">
-                     <p class="text-[11px] font-bold text-gray-300 uppercase tracking-widest"><?php echo e($products->count()); ?> Results</p>
+                <!-- ── PRODUCT GRID ─────────────────────────────────────────── -->
+                <div id="products-container" class="relative min-h-[400px]">
+                    <div :class="{ 'opacity-50 pointer-events-none': loading }" class="transition-opacity duration-300">
+                        <?php echo $__env->make('storefront.partials.products-grid', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                    </div>
+                    
+                    <template x-if="loading">
+                        <div class="absolute inset-0 flex items-center justify-center z-10">
+                            <div class="w-12 h-12 border-4 border-black/10 border-t-black rounded-full animate-spin"></div>
+                        </div>
+                    </template>
                 </div>
-            </div>
-
-            <!-- ── PRODUCT GRID ─────────────────────────────────────────── -->
-            <div>
-                <?php if($products->isEmpty()): ?>
-                    <div class="py-40 text-center">
-                        <h3 class="text-2xl font-serif mb-4 text-gray-400">No fragrances found</h3>
-                        <p class="text-[11px] text-gray-300 font-bold uppercase tracking-widest">More coming soon</p>
-                    </div>
-                <?php else: ?>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-16">
-                        <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <?php if (isset($component)) { $__componentOriginal3fd2897c1d6a149cdb97b41db9ff827a = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal3fd2897c1d6a149cdb97b41db9ff827a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.product-card','data' => ['product' => $product]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('product-card'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['product' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($product)]); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal3fd2897c1d6a149cdb97b41db9ff827a)): ?>
-<?php $attributes = $__attributesOriginal3fd2897c1d6a149cdb97b41db9ff827a; ?>
-<?php unset($__attributesOriginal3fd2897c1d6a149cdb97b41db9ff827a); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal3fd2897c1d6a149cdb97b41db9ff827a)): ?>
-<?php $component = $__componentOriginal3fd2897c1d6a149cdb97b41db9ff827a; ?>
-<?php unset($__componentOriginal3fd2897c1d6a149cdb97b41db9ff827a); ?>
-<?php endif; ?>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
     </div>

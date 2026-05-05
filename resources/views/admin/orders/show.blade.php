@@ -11,7 +11,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <div class="flex items-center gap-3 mb-1">
-                <h1 class="text-xl font-black text-gray-900 tracking-tight">Order #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</h1>
+                <h1 class="text-xl font-black text-gray-900 tracking-tight uppercase">Order #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</h1>
                 @if($order->status === 'paid')
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200/50 uppercase tracking-widest shadow-sm">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
@@ -24,7 +24,7 @@
                     </span>
                 @endif
             </div>
-            <p class="text-[13px] font-bold text-gray-400 uppercase tracking-widest">Placed on {{ $order->created_at->format('d M Y, h:i A') }}</p>
+            <p class="text-[12px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Placed on {{ $order->created_at->format('d M Y, h:i A') }}</p>
         </div>
     </div>
 

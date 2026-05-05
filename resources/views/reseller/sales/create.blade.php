@@ -1,6 +1,6 @@
 <x-app-layout title="Record Sale">
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-full">
 
         {{-- ── Back link ───────────────────────────────────────────────────── --}}
         <a href="{{ route('reseller.sales.index') }}"
@@ -15,9 +15,9 @@
         <div class="bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-200/40 overflow-hidden">
 
             {{-- Card Header --}}
-            <div class="px-8 py-6 border-b border-gray-50/80 bg-gray-50/30">
-                <h1 class="text-[17px] font-bold text-gray-900 tracking-tight">Record New Sale</h1>
-                <p class="text-[13px] font-medium text-gray-500 mt-1">Select a product from your available stock and enter the quantity sold.</p>
+            <div class="px-8 py-6 border-b border-gray-50/80 bg-gray-50/20">
+                <h1 class="text-[14px] font-black text-gray-900 uppercase tracking-[0.1em]">Record New Sale</h1>
+                <p class="text-[11px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Select product and quantity from stock</p>
             </div>
 
             {{-- Form --}}
@@ -33,14 +33,20 @@
                     <div class="space-y-6">
                         {{-- Product Selector --}}
                         <div>
-                            <label for="product_id" class="block text-[13px] font-bold text-gray-700 mb-2">
-                                Select Product <span class="text-red-500">*</span>
-                            </label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="product_id" class="block text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                    Product <span class="text-black">*</span>
+                                </label>
+                                <button type="button" @click="$dispatch('open-scanner')" class="text-[11px] font-black text-black hover:opacity-70 flex items-center gap-1 uppercase tracking-widest transition-all">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+                                    Scan
+                                </button>
+                            </div>
                             <select id="product_id"
                                     name="product_id"
                                     required
                                     class="w-full px-4 py-3 text-[14px] font-medium text-gray-900 bg-gray-50/50 border rounded-xl transition-all duration-300
-                                           focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
+                                           focus:outline-none focus:ring-black/5 focus:border-black
                                            cursor-pointer appearance-none bg-no-repeat bg-[position:right_1rem_center] bg-[length:1em_1em]
                                            {{ $errors->has('product_id') ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200' }}"
                                     style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22currentColor%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E');">
@@ -50,6 +56,7 @@
                                             data-price="{{ $stock->product->retail_price }}"
                                             data-stock="{{ $stock->quantity }}"
                                             data-volume="{{ $stock->product->volume_ml }}"
+                                            data-sku="{{ $stock->product->sku }}"
                                             {{ old('product_id') == $stock->product_id ? 'selected' : '' }}>
                                         {{ $stock->product->name }} ({{ $stock->product->volume_ml }}ml)
                                     </option>
@@ -67,8 +74,8 @@
 
                         {{-- Quantity Input --}}
                         <div>
-                            <label for="quantity" class="block text-[13px] font-bold text-gray-700 mb-2">
-                                Quantity Sold <span class="text-red-500">*</span>
+                            <label for="quantity" class="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                                Quantity <span class="text-black">*</span>
                             </label>
                             <div class="flex gap-3">
                                 <button type="button"
@@ -87,7 +94,7 @@
                                        value="{{ old('quantity', 1) }}"
                                        required
                                        class="flex-1 text-center text-[16px] font-black text-gray-900 border bg-gray-50/50 rounded-xl px-4 py-3
-                                              transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
+                                              transition-all duration-300 focus:outline-none focus:ring-black/5 focus:border-black
                                               {{ $errors->has('quantity') ? 'border-red-400' : 'border-gray-200' }}">
 
                                 <button type="button"
@@ -123,8 +130,8 @@
                     <div class="space-y-6">
                         
                         {{-- Product Info Panel --}}
-                        <div id="product-info" class="hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50/50 to-white p-6 shadow-sm">
-                            <h3 class="text-[11px] font-black text-blue-400 uppercase tracking-widest mb-4">Stock Overview</h3>
+                        <div id="product-info" class="hidden rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                            <h3 class="text-[11px] font-black text-black uppercase tracking-widest mb-4">Stock Overview</h3>
                             <div class="grid grid-cols-2 gap-y-5 gap-x-4">
                                 <div>
                                     <p class="text-[11px] font-bold text-gray-500 mb-0.5">Unit Price</p>
@@ -137,9 +144,9 @@
                                 <div class="col-span-2">
                                     <p class="text-[11px] font-bold text-gray-500 mb-1">Available in Stock</p>
                                     <div class="flex items-center gap-3">
-                                        <p id="info-stock" class="text-[20px] font-black text-blue-600">—</p>
-                                        <div class="flex-1 bg-blue-100 rounded-full h-1.5 overflow-hidden">
-                                            <div id="info-stock-bar" class="h-1.5 rounded-full bg-blue-500 transition-all duration-500" style="width: 100%"></div>
+                                        <p id="info-stock" class="text-[20px] font-black text-black">—</p>
+                                        <div class="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                            <div id="info-stock-bar" class="h-1.5 rounded-full bg-black transition-all duration-500" style="width: 100%"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -166,10 +173,10 @@
                     </button>
 
                     <button type="submit" id="submit-btn"
-                            class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700
-                                   text-white text-[13px] font-bold rounded-xl shadow-md shadow-blue-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5
-                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            class="inline-flex items-center gap-2 px-8 py-3 bg-black hover:opacity-90
+                                   text-white text-[13px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-black/10 transition-all duration-300 hover:-translate-y-0.5
+                                   focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
                         Confirm Sale
@@ -179,11 +186,14 @@
         </div>
         
         <p class="text-[12px] font-medium text-gray-400 text-center mt-6">
-            <span class="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1.5 opacity-50"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-black mr-1.5 opacity-50"></span>
             Stock levels will instantly reflect this transaction upon confirmation.
         </p>
 
     </div>
+
+    {{-- The unified scanner component --}}
+    <x-scanner-modal target-event="barcode-scanned" />
 
     {{-- ═══════════════════════════════════════════════════════════════
          JAVASCRIPT
@@ -248,8 +258,8 @@
                 infoStockBar.className = 'h-1.5 rounded-full transition-all duration-500 bg-amber-400';
                 infoStockBar.style.width = pct + '%';
             } else {
-                infoStock.className = 'text-[20px] font-black text-blue-600';
-                infoStockBar.className = 'h-1.5 rounded-full transition-all duration-500 bg-blue-500';
+                infoStock.className = 'text-[20px] font-black text-black';
+                infoStockBar.className = 'h-1.5 rounded-full transition-all duration-500 bg-black';
                 infoStockBar.style.width = pct + '%';
             }
 
@@ -298,6 +308,26 @@
             submitBtn.disabled  = true;
             currentPrice = 0;
             currentStock = 0;
+        });
+
+        // Listen for scanner events
+        window.addEventListener('barcode-scanned', (e) => {
+            const scannedSku = e.detail.sku;
+            let found = false;
+            Array.from(productSelect.options).forEach(opt => {
+                if (opt.dataset.sku === scannedSku) {
+                    productSelect.value = opt.value;
+                    found = true;
+                }
+            });
+            
+            if (found) {
+                const currentQty = parseInt(qtyInput.value) || 0;
+                qtyInput.value = currentQty + 1; // Increment quantity automatically on scan
+                update();
+            } else {
+                alert("Scanned product not found in your inventory!");
+            }
         });
 
         if (productSelect.value) { update(); } else { submitBtn.disabled = true; }

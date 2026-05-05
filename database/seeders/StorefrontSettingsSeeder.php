@@ -15,32 +15,33 @@ class StorefrontSettingsSeeder extends Seeder
         $settings = [
             // Global Settings
             ['key' => 'brand_name', 'value' => 'Laman Store', 'type' => 'text', 'group' => 'global'],
-            ['key' => 'announcement_bar_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'global'],
-            ['key' => 'announcement_bar_text', 'value' => 'Complimentary Shipping on all orders over RM150', 'type' => 'text', 'group' => 'global'],
-            ['key' => 'footer_instagram', 'value' => 'https://instagram.com', 'type' => 'text', 'group' => 'global'],
-            ['key' => 'footer_facebook', 'value' => 'https://facebook.com', 'type' => 'text', 'group' => 'global'],
+            ['key' => 'announcement_bar_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'announcement'],
+            ['key' => 'announcement_bar_text', 'value' => 'Complimentary Shipping on all orders over RM150', 'type' => 'text', 'group' => 'announcement'],
+            ['key' => 'footer_instagram', 'value' => 'https://instagram.com', 'type' => 'text', 'group' => 'social'],
+            ['key' => 'footer_facebook', 'value' => 'https://facebook.com', 'type' => 'text', 'group' => 'social'],
+            ['key' => 'contact_whatsapp', 'value' => '+60123456789', 'type' => 'text', 'group' => 'contact'],
+            ['key' => 'contact_email', 'value' => 'concierge@lamanstore.com', 'type' => 'text', 'group' => 'contact'],
+            ['key' => 'copyright_text', 'value' => '© 2026 Laman Store Malaysia. All rights reserved.', 'type' => 'text', 'group' => 'global'],
 
             // Homepage Settings
             ['key' => 'homepage_title', 'value' => 'The Art of Pure Essence', 'type' => 'text', 'group' => 'homepage'],
             ['key' => 'homepage_subtitle', 'value' => 'The Laman Signature', 'type' => 'text', 'group' => 'homepage'],
             ['key' => 'homepage_hero_image', 'value' => 'hero/hero_cinematic.png', 'type' => 'image', 'group' => 'homepage'],
+            ['key' => 'new_arrivals_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'new_arrivals'],
+            ['key' => 'best_sellers_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'best_sellers'],
+            ['key' => 'promotions_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'promotion_layout'],
 
             // Collection Settings
-            ['key' => 'collection_title', 'value' => 'OUR COLLECTION', 'type' => 'text', 'group' => 'collection'],
-            ['key' => 'collection_description', 'value' => 'Timeless Scents. Curated for You.', 'type' => 'textarea', 'group' => 'collection'],
             ['key' => 'collection_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'collection'],
 
             // New Arrivals Settings
-            ['key' => 'new_arrivals_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'new_arrivals'],
+            // Moved hero image to homepage group
 
             // Best Sellers Settings
-            ['key' => 'best_sellers_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'best_sellers'],
+            // Moved hero image to homepage group
 
             // Promotions Settings
-            ['key' => 'enable_promotions_page', 'value' => '1', 'type' => 'boolean', 'group' => 'promotions'],
-            ['key' => 'promotions_title', 'value' => 'Exclusive Promos', 'type' => 'text', 'group' => 'promotions'],
-            ['key' => 'promotions_description', 'value' => 'Discover our latest promotional events and seasonal discounts.', 'type' => 'textarea', 'group' => 'promotions'],
-            ['key' => 'promotions_hero_image', 'value' => 'hero/shop_banner_cinematic.png', 'type' => 'image', 'group' => 'promotions'],
+            // Moved hero image to homepage group
 
             // Scent Finder Settings
             ['key' => 'scent_finder_hero_image', 'value' => 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=2000', 'type' => 'image', 'group' => 'scent_finder'],
@@ -49,6 +50,18 @@ class StorefrontSettingsSeeder extends Seeder
             // Auth Settings
             ['key' => 'sign_in_image', 'value' => 'hero/hero_cinematic.png', 'type' => 'image', 'group' => 'auth'],
             ['key' => 'sign_up_image', 'value' => 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1974&auto=format&fit=crop', 'type' => 'image', 'group' => 'auth'],
+
+            // Branding & Appearance Settings
+            ['key' => 'philosophy_title', 'value' => 'Our Philosophy', 'type' => 'text', 'group' => 'philosophy'],
+            ['key' => 'philosophy_quote', 'value' => 'Fragrances are not just scents, they are stories bottled in glass, waiting to be told across your skin.', 'type' => 'textarea', 'group' => 'philosophy'],
+            ['key' => 'philosophy_link_text', 'value' => 'Our Heritage', 'type' => 'text', 'group' => 'philosophy'],
+            ['key' => 'footer_story', 'value' => 'Join our community for early access to exclusive promotions, seasonal sales, and the art of fine fragrance.', 'type' => 'textarea', 'group' => 'branding'],
+            ['key' => 'theme_typography_pairing', 'value' => 'classic', 'type' => 'select', 'group' => 'appearance'],
+            ['key' => 'homepage_hero_scrim', 'value' => '0.3', 'type' => 'text', 'group' => 'appearance'],
+
+            // Customer Engagement Settings
+            ['key' => 'scent_finder_cta_text', 'value' => 'Secure Your Signature', 'type' => 'text', 'group' => 'engagement'],
+            ['key' => 'announcement_bar_sticky', 'value' => '0', 'type' => 'boolean', 'group' => 'engagement'],
         ];
 
         foreach ($settings as $setting) {

@@ -35,31 +35,45 @@
         </header>
 
         <div class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-16">
-            <!-- ── REFINED TOP BAR ────────────────────────── -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-16 pb-8 border-b border-gray-100 gap-8">
-                <div class="flex items-center gap-12">
-                     <p class="text-[13px] font-black uppercase tracking-widest text-black">{{ $pageTitle ?? 'Collection' }}</p>
+            <div x-data="{ 
+                loading: false,
+                async fetchProducts(url) {
+                    this.loading = true;
+                    try {
+                        const response = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        const html = await response.text();
+                        document.getElementById('products-container').innerHTML = html;
+                        window.history.pushState({}, '', url);
+                        window.scrollTo({ top: document.getElementById('products-container').offsetTop - 150, behavior: 'smooth' });
+                    } catch (error) {
+                        console.error('Error fetching products:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }" @click="if($event.target.closest('.ajax-link')) { $event.preventDefault(); fetchProducts($event.target.closest('.ajax-link').href); }">
+                
+                <!-- ── REFINED TOP BAR ────────────────────────── -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-16 pb-8 border-b border-gray-100 gap-8">
+                    <div class="flex items-center gap-12">
+                         <p class="text-[13px] font-black uppercase tracking-widest text-black">{{ $pageTitle ?? 'Collection' }}</p>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-12">
-                     <p class="text-[11px] font-bold text-gray-300 uppercase tracking-widest">{{ $products->count() }} Results</p>
+                <!-- ── PRODUCT GRID ─────────────────────────────────────────── -->
+                <div id="products-container" class="relative min-h-[400px]">
+                    <div :class="{ 'opacity-50 pointer-events-none': loading }" class="transition-opacity duration-300">
+                        @include('storefront.partials.products-grid')
+                    </div>
+                    
+                    <template x-if="loading">
+                        <div class="absolute inset-0 flex items-center justify-center z-10">
+                            <div class="w-12 h-12 border-4 border-black/10 border-t-black rounded-full animate-spin"></div>
+                        </div>
+                    </template>
                 </div>
-            </div>
-
-            <!-- ── PRODUCT GRID ─────────────────────────────────────────── -->
-            <div>
-                @if($products->isEmpty())
-                    <div class="py-40 text-center">
-                        <h3 class="text-2xl font-serif mb-4 text-gray-400">No fragrances found</h3>
-                        <p class="text-[11px] text-gray-300 font-bold uppercase tracking-widest">More coming soon</p>
-                    </div>
-                @else
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-16">
-                        @foreach($products as $product)
-                            <x-product-card :product="$product" />
-                        @endforeach
-                    </div>
-                @endif
             </div>
         </div>
     </div>

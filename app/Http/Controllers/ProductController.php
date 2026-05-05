@@ -54,7 +54,11 @@ class ProductController extends Controller
         [$sortCol, $sortDir] = $sortMap[$request->input('sort', 'name')] ?? ['name', 'asc'];
         $query->orderBy($sortCol, $sortDir);
 
-        $products = $query->get();
+        $products = $query->paginate(10)->appends($request->all());
+
+        if ($request->ajax() && !$request->header('X-SPA')) {
+            return view('admin.products.partials.table', compact('products'))->render();
+        }
 
         // Summary stats for header
         $totalProducts   = Product::count();
@@ -68,8 +72,14 @@ class ProductController extends Controller
         $volumes = Product::distinct()->orderBy('volume_ml')->pluck('volume_ml');
 
         return view('admin.products.index', compact(
-            'products', 'totalProducts', 'totalStock', 'adminStock', 'resellerStock',
-            'lowStockCount', 'outOfStock', 'volumes'
+            'products',
+            'totalProducts',
+            'totalStock',
+            'lowStockCount',
+            'outOfStock',
+            'volumes',
+            'adminStock',
+            'resellerStock'
         ));
     }
 

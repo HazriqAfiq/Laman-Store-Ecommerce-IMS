@@ -15,27 +15,27 @@
     ═══════════════════════════════════════════════════════════════ --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-xl font-bold text-gray-900 tracking-tight">Sales History</h1>
-            <p class="text-sm font-medium text-gray-500 mt-1">Your registered transactions for the selected period</p>
+            <h1 class="text-xl font-black text-gray-900 tracking-tight uppercase">Sales History</h1>
+            <p class="text-[12px] font-medium text-gray-500 mt-1 uppercase tracking-widest">Transactions for the selected period</p>
         </div>
         <a href="{{ route('reseller.sales.create') }}"
-           class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700
-                  text-white text-[13px] font-bold rounded-xl shadow-md shadow-blue-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5 shrink-0">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+           class="inline-flex items-center gap-1.5 px-6 py-2.5 bg-black hover:bg-gray-900
+                  text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
             </svg>
-            Record Sale
+            <span>Record Sale</span>
         </a>
     </div>
 
     {{-- ═══════════════════════════════════════════════════════════════
          MONTH FILTER
     ═══════════════════════════════════════════════════════════════ --}}
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-4 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         
         <form method="GET" action="{{ route('reseller.sales.index') }}" id="filter-form" class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
-            <div class="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest shrink-0 px-2">
-                <svg class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <div class="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-widest shrink-0 px-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
                 Timeframe
@@ -43,11 +43,11 @@
             
             <div class="flex-1 flex flex-col sm:flex-row items-center gap-3">
                 <select id="year" name="year" onchange="document.getElementById('filter-form').submit()"
-                        class="w-full sm:w-auto px-4 py-2.5 text-sm font-bold text-gray-800 bg-gray-50/50 border border-gray-200 rounded-xl
-                               focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                               cursor-pointer appearance-none transition-all duration-300 pr-10"
-                        style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%239ca3af%22><path fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/></svg>');
-                               background-repeat:no-repeat;background-position:right 1rem center;background-size:1rem;">
+                        class="w-full sm:w-auto px-6 py-2.5 text-[13px] font-black text-gray-900 bg-gray-50 border border-gray-100 rounded-xl
+                               focus:outline-none focus:ring-black focus:border-black
+                               cursor-pointer appearance-none transition-all duration-300 pr-12 uppercase tracking-widest"
+                        style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%23000000%22><path fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/></svg>');
+                               background-repeat:no-repeat;background-position:right 1.2rem center;background-size:1.2rem;">
                     @foreach($availableYears as $year)
                         <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>
                             {{ $year }}
@@ -56,15 +56,15 @@
                 </select>
 
                 <select id="month" name="month" onchange="document.getElementById('filter-form').submit()"
-                        class="w-full sm:w-auto px-4 py-2.5 text-sm font-bold text-gray-800 bg-gray-50/50 border border-gray-200 rounded-xl
-                               focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                               cursor-pointer appearance-none transition-all duration-300 pr-10"
-                        style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%239ca3af%22><path fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/></svg>');
-                               background-repeat:no-repeat;background-position:right 1rem center;background-size:1rem;">
+                        class="w-full sm:w-auto px-6 py-2.5 text-[13px] font-black text-gray-900 bg-gray-50 border border-gray-100 rounded-xl
+                               focus:outline-none focus:ring-black focus:border-black
+                               cursor-pointer appearance-none transition-all duration-300 pr-12 uppercase tracking-widest"
+                        style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%23000000%22><path fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/></svg>');
+                               background-repeat:no-repeat;background-position:right 1.2rem center;background-size:1.2rem;">
                     <option value="">All Months</option>
                     @foreach($availableMonths as $m)
                         <option value="{{ $m }}" {{ $selectedMonth == $m ? 'selected' : '' }}>
-                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                            {{ strtoupper(\Carbon\Carbon::create()->month($m)->format('F')) }}
                         </option>
                     @endforeach
                 </select>
@@ -72,8 +72,8 @@
         </form>
 
         <div class="px-2 shrink-0">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100/80 text-[11px] font-black text-gray-500 rounded-lg tracking-wider uppercase border border-gray-200/50">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.5)]"></span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-black text-[10px] font-black text-white rounded-lg tracking-[0.2em] uppercase shadow-lg shadow-black/10">
+                <span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
                 {{ $periodLabel }}
             </span>
         </div>
@@ -87,64 +87,64 @@
         {{-- KPIs Column --}}
         <div class="col-span-1 flex flex-col gap-5">
             {{-- Revenue --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg shadow-gray-200/50 p-5 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 flex-1">
-                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-tl-[80px] -mr-8 -mb-8 transition-transform duration-500 group-hover:scale-110"></div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 flex-1">
+                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-transparent rounded-tl-[80px] -mr-8 -mb-8 transition-transform duration-500 group-hover:scale-110"></div>
                 <div class="flex items-start justify-between mb-4 relative z-10">
-                    <span class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100/50 flex items-center justify-center text-blue-600 shadow-[0_2px_10px_rgba(59,130,246,0.15)]">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <span class="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/10">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </span>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">My Revenue</p>
+                    <p class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">My Revenue</p>
                     <p class="text-2xl font-black text-gray-900 tracking-tight">RM{{ number_format($monthRevenue, 0) }}</p>
                 </div>
             </div>
 
             {{-- Units Sold --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg shadow-gray-200/50 p-5 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 flex-1">
-                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-violet-50 to-transparent rounded-tl-[80px] -mr-8 -mb-8 transition-transform duration-500 group-hover:scale-110"></div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 flex-1">
+                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-transparent rounded-tl-[80px] -mr-8 -mb-8 transition-transform duration-500 group-hover:scale-110"></div>
                 <div class="flex items-start justify-between mb-4 relative z-10">
-                    <span class="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100/50 flex items-center justify-center text-violet-600 shadow-[0_2px_10px_rgba(139,92,246,0.15)]">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <span class="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/10">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
                     </span>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Units Sold</p>
+                    <p class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Units Sold</p>
                     <p class="text-2xl font-black text-gray-900 tracking-tight">{{ number_format($monthUnitsSold) }}</p>
                 </div>
             </div>
 
             {{-- Transactions --}}
-            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg shadow-gray-200/50 p-5 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 flex-1">
-                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-50 to-transparent rounded-tl-[80px] -mr-8 -mb-8 transition-transform duration-500 group-hover:scale-110"></div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 flex-1">
+                <div class="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-transparent rounded-tl-[80px] -mr-8 -mb-8 transition-transform duration-500 group-hover:scale-110"></div>
                 <div class="flex items-start justify-between mb-4 relative z-10">
-                    <span class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/50 flex items-center justify-center text-amber-600 shadow-[0_2px_10px_rgba(245,158,11,0.15)]">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <span class="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/10">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                     </span>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Transactions</p>
+                    <p class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total Transactions</p>
                     <p class="text-2xl font-black text-gray-900 tracking-tight">{{ number_format($monthTransactions) }}</p>
                 </div>
             </div>
         </div>
 
         {{-- Main Trend Chart --}}
-        <div class="col-span-1 lg:col-span-3 bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-200/40 p-7 relative">
+        <div class="col-span-1 lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-7 relative">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-[15px] font-bold text-gray-900 tracking-tight">Performance Trend</h2>
+                    <h2 class="text-[15px] font-black text-gray-900 tracking-tight">Performance Trend</h2>
                     <p class="text-[12px] font-medium text-gray-500 mt-1">Your revenue & volume for {{ $periodLabel }}</p>
                 </div>
-                <div class="flex items-center gap-5 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span>Revenue</span>
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-violet-400 opacity-60"></span>Units</span>
+                <div class="flex items-center gap-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-black shadow-lg shadow-black/20"></span>Revenue</span>
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-md bg-gray-200"></span>Units</span>
                 </div>
             </div>
             <div class="relative h-[360px] w-full">
@@ -157,101 +157,64 @@
     {{-- ═══════════════════════════════════════════════════════════════
          SALES TABLE
     ═══════════════════════════════════════════════════════════════ --}}
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-200/40 overflow-hidden mb-12">
-        <div class="px-7 py-5 border-b border-gray-50/80 flex items-center justify-between">
+    <div x-data="{ 
+            loading: false,
+            async fetchSales(url = null) {
+                this.loading = true;
+                const form = document.getElementById('filter-form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData);
+                
+                let targetUrl = url || `{{ route('reseller.sales.index') }}?${params.toString()}`;
+                
+                if (!url) {
+                    window.location.href = targetUrl;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(targetUrl, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const html = await response.text();
+                    document.getElementById('table-container').innerHTML = html;
+                    window.history.pushState({}, '', targetUrl);
+                } catch (error) {
+                    console.error('Error fetching sales:', error);
+                } finally {
+                    this.loading = false;
+                }
+            }
+         }"
+         @click="if($event.target.closest('.pagination a')) { $event.preventDefault(); fetchSales($event.target.closest('.pagination a').href); }"
+         class="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mb-12 relative">
+        
+        <div x-show="loading" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center">
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-10 h-10 border-4 border-blue-600/10 border-t-blue-600 rounded-full animate-spin"></div>
+                <p class="text-[11px] font-bold text-blue-600 uppercase tracking-widest">Updating Ledger...</p>
+            </div>
+        </div>
+
+        <div class="px-7 py-6 border-b border-gray-50/80 flex items-center justify-between bg-gray-50/20">
             <div>
-                <h2 class="text-[15px] font-bold text-gray-900 tracking-tight">Sales Ledger</h2>
-                <p class="text-xs font-medium text-gray-500 mt-1">
-                    {{ $monthTransactions }} processing {{ Str::plural('record', $monthTransactions) }}
+                <h2 class="text-[14px] font-black text-gray-900 uppercase tracking-[0.1em]">Sales Ledger</h2>
+                <p class="text-[11px] font-medium text-gray-500 mt-1 uppercase tracking-widest">
+                    {{ $monthTransactions }} processing {{ Str::plural('record', $monthTransactions) }} for {{ $periodLabel }}
                 </p>
             </div>
-            @if($monthTransactions > 0)
-                <span class="inline-block text-[11px] font-black bg-gray-100/80 border border-gray-200/50 text-gray-500 px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
-                    Showing {{ $sales->firstItem() ?? 0 }}-{{ $sales->lastItem() ?? 0 }}
-                </span>
-            @endif
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="bg-gray-50/50 border-b border-gray-100/80">
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date & Time</th>
-                        <th class="text-left px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Product</th>
-                        <th class="text-center px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">Volume</th>
-                        <th class="text-center px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Qty</th>
-                        <th class="text-right px-7 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Revenue</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50/80">
-                    @forelse($sales as $sale)
-                        <tr class="hover:bg-gray-50/60 transition-colors duration-100">
-                            <td class="px-7 py-4.5 whitespace-nowrap">
-                                <p class="text-[13px] font-medium text-gray-900">{{ $sale->created_at->format('d M Y') }}</p>
-                                <p class="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-wider">{{ $sale->created_at->format('h:i A') }}</p>
-                            </td>
-                            <td class="px-7 py-4.5">
-                                <p class="text-[13px] font-medium text-gray-900">{{ $sale->product->name }}</p>
-                            </td>
-                            <td class="px-7 py-4.5 text-center hidden sm:table-cell">
-                                <span class="inline-block text-[11px] font-medium bg-gray-100 border border-gray-200/80 text-gray-500 px-2.5 py-0.5 rounded-md shadow-sm">
-                                    {{ $sale->product->volume_ml }}ml
-                                </span>
-                            </td>
-                            <td class="px-7 py-4.5 text-center">
-                                <span class="inline-flex items-center justify-center min-w-[2rem] px-1.5 h-6 rounded-lg bg-white border border-gray-200 text-gray-600 shadow-sm text-[12px] font-medium">
-                                    {{ $sale->quantity }}
-                                </span>
-                            </td>
-                            <td class="px-7 py-4.5 text-right">
-                                <span class="text-[14px] font-black text-gray-900">
-                                    RM{{ number_format($sale->total_price, 2) }}
-                                </span>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-7 py-16 text-center">
-                                <div class="flex flex-col items-center gap-3">
-                                    <div class="w-16 h-16 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center mb-1">
-                                        <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                        </svg>
-                                    </div>
-                                    <p class="text-[15px] font-bold text-gray-900">No sales recorded yet</p>
-                                    <p class="text-[12px] text-gray-500">Record a new sale or adjust your timeframe filter.</p>
-                                    <a href="{{ route('reseller.sales.create') }}" class="text-[12px] font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl hover:bg-blue-100 transition-colors inline-flex cursor-pointer mt-2">Record Sale</a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-
-                {{-- Page total footer --}}
-                @if($sales->count() > 0)
-                    <tfoot>
-                        <tr class="border-t border-gray-100 bg-gray-50/80">
-                            <td colspan="3" class="px-7 py-5 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-right">
-                                Page Total
-                            </td>
-                            <td class="px-7 py-5 text-center text-[14px] font-black text-gray-700">
-                                {{ number_format($sales->sum('quantity')) }}
-                            </td>
-                            <td class="px-7 py-5 text-right text-[15px] font-black text-gray-900">
-                                RM{{ number_format($sales->sum('total_price'), 2) }}
-                            </td>
-                        </tr>
-                    </tfoot>
-                @endif
-            </table>
+        <div id="table-container">
+            @include('reseller.sales.partials.table')
         </div>
-
-        {{-- Pagination --}}
-        @if(method_exists($sales, 'hasPages') && $sales->hasPages())
-            <div class="px-7 py-5 border-t border-gray-50">
-                {{ $sales->links() }}
-            </div>
-        @endif
     </div>
 
     {{-- ═══════════════════════════════════════════════════════════════
@@ -297,21 +260,21 @@
                         {
                             label: 'Revenue (RM)',
                             data: @json($trendRevenue),
-                            borderColor: '#3b82f6',
-                            backgroundColor: revGradient,
-                            fill: true, tension: 0.5,
+                            borderColor: '#000000',
+                            backgroundColor: createGradient(trendCtx, 'rgba(0, 0, 0, 0.05)', 'rgba(0, 0, 0, 0)'),
+                            fill: true, tension: 0.4,
                             pointRadius: 0, pointHoverRadius: 6,
-                            pointBackgroundColor: '#ffffff', pointBorderColor: '#3b82f6',
+                            pointBackgroundColor: '#ffffff', pointBorderColor: '#000000',
                             borderWidth: 3, yAxisID: 'yRevenue',
                         },
                         {
                             label: 'Units Sold',
                             data: @json($trendUnits),
-                            borderColor: '#a78bfa',
+                            borderColor: '#e5e7eb',
                             backgroundColor: 'transparent',
-                            fill: false, tension: 0.5,
+                            fill: false, tension: 0.4,
                             pointRadius: 0, pointHoverRadius: 6,
-                            pointBackgroundColor: '#ffffff', pointBorderColor: '#a78bfa',
+                            pointBackgroundColor: '#ffffff', pointBorderColor: '#e5e7eb',
                             borderWidth: 2, borderDash: [6, 4], yAxisID: 'yUnits',
                         }
                     ]

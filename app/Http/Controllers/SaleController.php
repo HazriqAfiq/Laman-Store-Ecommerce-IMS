@@ -55,7 +55,11 @@ class SaleController extends Controller
             $monthUnitsSold    = (clone $baseQuery)->sum('quantity');
             $monthTransactions = (clone $baseQuery)->count();
 
-            $sales = (clone $baseQuery)->latest()->paginate(15)->withQueryString();
+            $sales = (clone $baseQuery)->latest()->paginate(15)->appends($request->all());
+
+            if ($request->ajax() && !$request->header('X-SPA')) {
+                return view('admin.sales.partials.table', compact('sales'))->render();
+            }
 
             return view('admin.sales.index', compact(
                 'sales', 'selectedYear', 'selectedMonth', 'availableYears', 'availableMonths',
@@ -88,7 +92,12 @@ class SaleController extends Controller
         $monthUnitsSold    = (clone $baseQuery)->sum('quantity');
         $monthTransactions = (clone $baseQuery)->count();
 
-        $sales = (clone $baseQuery)->latest()->paginate(15)->withQueryString();
+        $sales = (clone $baseQuery)->latest()->paginate(15)->appends($request->all());
+
+        if ($request->ajax() && !$request->header('X-SPA')) {
+            $view = $isAdmin ? 'admin.sales.partials.table' : 'reseller.sales.partials.table';
+            return view($view, compact('sales'))->render();
+        }
 
         return view('reseller.sales.index', compact(
             'sales', 'selectedYear', 'selectedMonth', 'availableYears', 'availableMonths',

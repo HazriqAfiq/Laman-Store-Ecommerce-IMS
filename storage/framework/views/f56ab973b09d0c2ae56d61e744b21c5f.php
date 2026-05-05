@@ -1,3 +1,10 @@
+<?php if(request()->ajax()): ?>
+    <title><?php echo e(isset($title) ? $title . ' — ' : ''); ?>Laman Store · RPIMS</title>
+    <main id="main-content">
+        <?php echo e($slot); ?>
+
+    </main>
+<?php else: ?>
 <!DOCTYPE html>
 <html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 <head>
@@ -5,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <title><?php echo e(isset($title) ? $title . ' — ' : ''); ?>RPIMS · Reef Perfume</title>
+    <title><?php echo e(isset($title) ? $title . ' — ' : ''); ?>Laman Store · RPIMS</title>
 
     <!-- Inter Font (full weight range) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,12 +21,18 @@
 
     <!-- Scripts -->
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
     <style>
         body {
             font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
             font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
         }
+
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body class="bg-gray-50 antialiased text-gray-900">
@@ -34,32 +47,22 @@
 
     
     <aside id="sidebar"
-           class="fixed lg:relative top-0 left-0 h-screen w-72 lg:w-60 bg-white border-r border-gray-200
-                  shadow-[2px_0_20px_rgba(0,0,0,0.06)] flex flex-col shrink-0 overflow-hidden
-                  z-50 lg:z-20 group/sidebar
-                  -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-
-        <!-- Sidebar Top Glow -->
-        <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none"></div>
+           class="fixed lg:relative top-0 left-0 h-screen w-72 lg:w-64 bg-white border-r border-gray-200
+                  flex flex-col shrink-0 overflow-hidden z-50 lg:z-20 group/sidebar
+                  -translate-x-full lg:translate-x-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">
 
         <!-- Logo + Mobile Close -->
         <div class="h-16 lg:h-24 flex items-center justify-center px-5 lg:px-7 border-b border-gray-50 shrink-0 relative z-10">
             <a href="<?php echo e(Auth::check() && Auth::user()->isAdmin() ? route('admin.dashboard') : (Auth::check() ? route('reseller.dashboard') : '/')); ?>"
-               class="hidden lg:flex items-center gap-3 transition-transform hover:scale-[1.02]">
-                <img src="<?php echo e(asset('storage/branding/logo.png')); ?>"
-                     alt="Reef Perfume"
-                     class="h-8 lg:h-10 w-auto object-contain drop-shadow-sm"
-                     onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
-                <div id="logo-fallback" class="hidden items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-md shadow-blue-500/20 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-[15px] font-black text-gray-900 leading-none tracking-tight">RPIMS</p>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-1">Reef Perfume</p>
-                    </div>
+               class="flex items-center gap-3 transition-transform hover:scale-[1.02]">
+                <div class="w-9 h-9 rounded-xl bg-black shadow-lg shadow-black/10 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[15px] font-black text-gray-900 leading-none tracking-tight">LAMAN</p>
+                    <p class="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] leading-none mt-1.5">STORE</p>
                 </div>
             </a>
             <!-- Close button (mobile only) — absolute so it doesn't affect logo centering -->
@@ -71,76 +74,97 @@
         </div>
 
         <!-- Nav -->
-        <nav class="flex-1 overflow-y-auto py-4 lg:py-5 px-3 lg:px-4 space-y-0.5 relative z-10 scrollbar-hide">
+        <nav class="flex-1 overflow-y-auto pt-2 pb-6 px-3 lg:px-4 space-y-1 relative z-10 scrollbar-hide">
 
             <?php if(auth()->guard()->check()): ?>
                 <?php if(Auth::user()->isAdmin()): ?>
-                    <p class="px-3 pt-2 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Main</p>
+                    <p class="px-3 pt-2 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Overview</p>
 
                     <a href="<?php echo e(route('admin.dashboard')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('admin.dashboard') ? 'active' : ''); ?>" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         Dashboard
                     </a>
 
-                    <p class="px-3 pt-5 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Inventory</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Operations</p>
+
+                    <a href="<?php echo e(route('admin.sales.pos')); ?>"
+                       class="sidebar-link group <?php echo e(request()->routeIs('admin.sales.pos') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Point of Sale
+                    </a>
+
+                    <a href="<?php echo e(route('admin.inventory.scan-in')); ?>"
+                       class="sidebar-link group <?php echo e(request()->routeIs('admin.inventory.scan-in') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                        Scan & Restock
+                    </a>
+
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Management</p>
 
                     <a href="<?php echo e(route('admin.products.index')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('admin.products.*') ? 'active' : ''); ?>" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                        Products Catalog
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        Products
                     </a>
 
                     <a href="<?php echo e(route('admin.orders.index')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('admin.orders.*') ? 'active' : ''); ?>" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         Wholesale Orders
                     </a>
 
-                    <p class="px-3 pt-5 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sales</p>
+                    <a href="<?php echo e(route('admin.settings.page', ['page' => 'promotion'])); ?>"
+                       class="sidebar-link group <?php echo e(request()->is('admin/settings/promotion') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                        Promotions
+                    </a>
+
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Sales & Analytics</p>
 
                     <a href="<?php echo e(route('admin.sales.index')); ?>"
-                       class="sidebar-link group <?php echo e(request()->routeIs('admin.sales.*') ? 'active' : ''); ?>" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                       class="sidebar-link group <?php echo e(request()->routeIs('admin.sales.index') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         Global Sales
                     </a>
 
-                    <p class="px-3 pt-5 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Partnerships</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Partnerships</p>
 
                     <a href="<?php echo e(route('admin.resellers.index')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('admin.resellers.*') ? 'active' : ''); ?>" onclick="closeSidebar()">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Resellers Network
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Resellers
                     </a>
 
-                    <p class="px-3 pt-5 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Configuration</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Storefront UI</p>
 
-                    <div x-data="{ expanded: <?php echo e(request()->routeIs('admin.settings.*') ? 'true' : 'false'); ?> }">
-                        <button @click="expanded = !expanded" 
-                                class="w-full flex items-center justify-between sidebar-link group <?php echo e(request()->routeIs('admin.settings.*') ? 'active text-blue-600' : ''); ?>">
-                            <div class="flex items-center">
-                                <svg class="mr-3 text-gray-400 group-hover:text-blue-600 transition-colors duration-200" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span class="text-[13px] font-bold">Storefront Settings</span>
-                            </div>
-                            <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-transform duration-200" :class="{ 'rotate-180': expanded }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                        </button>
-                        
-                        <div x-show="expanded" x-collapse>
-                            <div class="mt-1 space-y-1 pl-11 relative before:absolute before:left-5 before:top-0 before:bottom-3 before:w-px before:bg-gray-200">
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'global'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/global') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Global Info</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'homepage'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/homepage') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Homepage</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'collection'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/collection') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Collection</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'new_arrivals'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/new_arrivals') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">New Arrivals</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'best_sellers'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/best_sellers') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Best Sellers</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'scent_finder'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/scent_finder') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Scent Finder Discovery</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'promotions'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/promotions') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Promotions Configuration</a>
-                                <a href="<?php echo e(route('admin.settings.page', ['page' => 'auth'])); ?>" class="block py-2 text-[12px] font-semibold <?php echo e(request()->is('admin/settings/auth') ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'); ?>">Authentication</a>
-                            </div>
-                        </div>
-                    </div>
+                    <a href="<?php echo e(route('admin.settings.page', ['page' => 'brand'])); ?>"
+                       class="sidebar-link group <?php echo e(request()->is('admin/settings/brand') || request()->is('admin/settings') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-2.066 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946 2.066 3.42 3.42 0 013.139 3.139 3.42 3.42 0 002.066 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-2.066 1.946 3.42 3.42 0 01-3.139 3.139 3.42 3.42 0 00-1.946 2.066 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-2.066 3.42 3.42 0 01-3.139-3.139 3.42 3.42 0 00-2.066-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 002.066-1.946 3.42 3.42 0 013.139-3.139z"/></svg>
+                        Brand
+                    </a>
+
+                    <a href="<?php echo e(route('admin.settings.page', ['page' => 'layout'])); ?>"
+                       class="sidebar-link group <?php echo e(request()->is('admin/settings/layout') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                        Layout
+                    </a>
+
+                    <a href="<?php echo e(route('admin.settings.page', ['page' => 'experience'])); ?>"
+                       class="sidebar-link group <?php echo e(request()->is('admin/settings/experience') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+                        Experience
+                    </a>
+
+                    <a href="<?php echo e(route('admin.settings.page', ['page' => 'system'])); ?>"
+                       class="sidebar-link group <?php echo e(request()->is('admin/settings/system') ? 'active' : ''); ?>" onclick="closeSidebar()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        System
+                    </a>
+
 
                 <?php elseif(Auth::user()->isReseller()): ?>
-                    <p class="px-3 pt-2 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Main</p>
+                    <p class="px-3 pt-2 pb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Main</p>
 
                     <a href="<?php echo e(route('reseller.dashboard')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('reseller.dashboard') ? 'active' : ''); ?>" onclick="closeSidebar()">
@@ -148,7 +172,7 @@
                         Dashboard
                     </a>
 
-                    <p class="px-3 pt-5 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Inventory</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">Inventory</p>
 
                     <a href="<?php echo e(route('reseller.stock.index')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('reseller.stock.*') ? 'active' : ''); ?>" onclick="closeSidebar()">
@@ -162,7 +186,7 @@
                         Restock / Orders
                     </a>
 
-                    <p class="px-3 pt-5 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sales</p>
+                    <p class="px-3 pt-6 pb-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">System</p>
 
                     <a href="<?php echo e(route('reseller.sales.create')); ?>"
                        class="sidebar-link group <?php echo e(request()->routeIs('reseller.sales.create') ? 'active' : ''); ?>" onclick="closeSidebar()">
@@ -181,27 +205,27 @@
 
         <!-- User Profile Footer -->
         <?php if(auth()->guard()->check()): ?>
-        <div class="border-t border-gray-50/80 p-4 lg:p-5 bg-gray-50/30 shrink-0 relative z-10 transition-colors hover:bg-gray-50">
+        <div class="border-t border-gray-100 p-3 lg:p-4 bg-white/50 backdrop-blur-sm shrink-0 relative z-10 transition-colors hover:bg-white/80">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-100/80 flex items-center justify-center text-blue-700 font-black text-xs shrink-0 border border-blue-200/50 shadow-inner">
+                <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-white font-black text-[11px] shrink-0 shadow-lg shadow-black/10 transition-transform hover:scale-105">
                     <?php echo e(strtoupper(substr(Auth::user()->name, 0, 2))); ?>
 
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-[13px] font-bold text-gray-900 truncate"><?php echo e(Auth::user()->name); ?></p>
-                    <p class="text-[11px] font-bold text-gray-400 truncate capitalize tracking-wide"><?php echo e(Auth::user()->role); ?></p>
+                    <p class="text-[13px] font-black text-gray-900 truncate tracking-tight"><?php echo e(Auth::user()->name); ?></p>
+                    <p class="text-[9px] font-black text-gray-400 truncate uppercase tracking-[0.1em] mt-0.5"><?php echo e(Auth::user()->role); ?></p>
                 </div>
             </div>
-            <div class="mt-3 flex rounded-xl border border-gray-200/60 overflow-hidden bg-white shadow-sm">
+            <div class="mt-3 flex gap-2">
                 <a href="<?php echo e(route('profile.edit')); ?>"
-                   class="flex-1 py-2.5 flex justify-center text-gray-500 hover:text-blue-600 hover:bg-blue-50/50 transition-colors border-r border-gray-100"
+                   class="flex-1 py-2 bg-white flex justify-center items-center rounded-lg text-gray-400 hover:text-black hover:border-black transition-all border border-gray-100 shadow-sm hover:shadow-md group/btn"
                    title="Profile Settings" onclick="closeSidebar()">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover/btn:rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </a>
                 <form method="POST" action="<?php echo e(route('logout')); ?>" class="flex-1">
                     <?php echo csrf_field(); ?>
-                    <button type="submit" class="w-full h-full py-2.5 flex justify-center text-gray-500 hover:text-red-600 hover:bg-red-50/50 transition-colors" title="Sign Out">
-                        <svg class="w-4 h-4 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <button type="submit" class="w-full h-full py-2 bg-white flex justify-center items-center rounded-lg text-red-400 hover:text-white hover:bg-black transition-all border border-gray-100 shadow-sm hover:shadow-md group/logout" title="Sign Out">
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover/logout:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                     </button>
                 </form>
             </div>
@@ -225,8 +249,8 @@
                 </button>
 
                 <?php if(isset($title)): ?>
-                    <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.5)] hidden sm:block"></div>
-                    <h1 class="text-[12px] sm:text-[13px] font-black tracking-widest uppercase text-gray-800 truncate"><?php echo e($title); ?></h1>
+                    <div class="w-1.5 h-1.5 rounded-full bg-black shadow-[0_0_6px_rgba(0,0,0,0.2)] hidden sm:block"></div>
+                    <h1 class="text-xs sm:text-sm font-bold tracking-wider uppercase text-gray-900 truncate"><?php echo e($title); ?></h1>
                 <?php endif; ?>
             </div>
 
@@ -234,16 +258,16 @@
             <a href="<?php echo e(Auth::check() && Auth::user()->isAdmin() ? route('admin.dashboard') : (Auth::check() ? route('reseller.dashboard') : '/')); ?>"
                class="lg:hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
                 <img src="<?php echo e(asset('storage/branding/logo.png')); ?>"
-                     alt="Reef Perfume"
+                     alt="Laman Store"
                      class="h-8 w-auto object-contain drop-shadow-sm"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="hidden items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                    <div class="w-7 h-7 rounded-lg bg-black flex items-center justify-center shadow-lg shadow-black/10">
                         <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
                         </svg>
                     </div>
-                    <span class="text-[13px] font-black text-gray-900 tracking-tight">RPIMS</span>
+                    <span class="text-[13px] font-black text-gray-900 tracking-tight">LAMAN STORE</span>
                 </div>
             </a>
 
@@ -263,7 +287,7 @@
                     <button
                         id="notif-bell-btn"
                         @click="toggle()"
-                        class="relative w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-100 transition-all duration-200 focus:outline-none"
+                        class="relative w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 hover:border-black transition-all duration-200 focus:outline-none"
                         aria-label="Notifications"
                     >
                         
@@ -311,14 +335,14 @@
                                     x-show="unreadCount > 0"
                                     x-cloak
                                     x-text="unreadCount"
-                                    class="text-[10px] font-black bg-blue-100 text-blue-700 rounded-full px-2 py-0.5"
+                                    class="text-[10px] font-black bg-black text-white rounded-full px-2 py-0.5"
                                 ></span>
                             </div>
                             <button
                                 @click="markAllRead()"
                                 x-show="unreadCount > 0"
                                 x-cloak
-                                class="text-[11px] font-bold text-blue-500 hover:text-blue-700 transition-colors px-2 py-1 rounded-md hover:bg-blue-50"
+                                class="text-[11px] font-black uppercase tracking-widest text-black hover:opacity-70 transition-colors px-2 py-1 rounded-md"
                             >Mark all read</button>
                         </div>
 
@@ -340,7 +364,7 @@
                                 <div
                                     @click="handleClick(notif)"
                                     class="flex items-start gap-3 px-4 py-3.5 cursor-pointer transition-colors duration-150"
-                                    :class="notif.is_read ? 'bg-white hover:bg-gray-50' : 'bg-blue-50/40 hover:bg-blue-50/70'"
+                                    :class="notif.is_read ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'"
                                 >
                                     
                                     <div
@@ -364,7 +388,7 @@
                                     </div>
 
                                     
-                                    <div x-show="!notif.is_read" class="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-2"></div>
+                                    <div x-show="!notif.is_read" class="w-2 h-2 rounded-full bg-black shrink-0 mt-2"></div>
                                 </div>
                             </template>
                         </div>
@@ -381,22 +405,230 @@
 
                 
                 <div class="hidden sm:flex items-center gap-2 text-gray-500">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <span class="text-[12px] font-bold text-gray-500 tracking-wide"><?php echo e(now()->format('d M Y')); ?></span>
+                    <span class="text-[12px] font-black text-gray-900 tracking-widest uppercase"><?php echo e(now()->format('d M Y')); ?></span>
                 </div>
             </div>
         </header>
 
         
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
             <?php echo e($slot); ?>
 
         </main>
     </div>
 
 </div>
+
+
+<script>
+document.addEventListener('click', async (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
+    // Only handle internal admin/reseller links, skip logout/profile/external
+    const url = new URL(link.href, window.location.origin);
+    const isInternal = url.origin === window.location.origin;
+    const isDashboardLink = url.pathname.includes('/admin') || url.pathname.includes('/reseller');
+    const isLogout = url.pathname.includes('/logout');
+    
+    // Skip if it's not internal, not an admin/reseller link, or is logout
+    if (!isInternal || !isDashboardLink || isLogout || e.ctrlKey || e.metaKey) return;
+
+    e.preventDefault();
+    navigateTo(link.href);
+});
+
+window.addEventListener('popstate', () => {
+    navigateTo(window.location.href, false);
+});
+
+document.addEventListener('submit', async (e) => {
+    const form = e.target;
+    // Handle both /admin and /reseller forms
+    const isDashboardForm = form.action.includes('/admin') || form.action.includes('/reseller');
+    if (!isDashboardForm || form.method.toLowerCase() !== 'post') return;
+    
+    if (form.action.includes('/logout')) return;
+
+    e.preventDefault();
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+    const mainContent = document.getElementById('main-content');
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+    }
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-SPA': 'true'
+            }
+        });
+
+        if (response.redirected) {
+            const isSamePage = new URL(response.url).pathname === window.location.pathname;
+            navigateTo(response.url, true, !isSamePage);
+            return;
+        }
+
+        const html = await response.text();
+        
+        if (html.includes('<main')) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            mainContent.innerHTML = doc.querySelector('main').innerHTML;
+            // Update title if needed
+            const newTitle = doc.querySelector('title');
+            if (newTitle) document.title = newTitle.innerText;
+        } else {
+            mainContent.innerHTML = html;
+        }
+
+        await executeScripts(mainContent);
+        
+    } catch (error) {
+        console.error('Form submission failed:', error);
+        form.submit(); // Fallback
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    }
+});
+
+async function navigateTo(url, push = true, resetScroll = true) {
+    const mainContent = document.getElementById('main-content');
+    
+    // Create or get progress bar
+    let progressBar = document.getElementById('nav-progress');
+    if (!progressBar) {
+        progressBar = document.createElement('div');
+        progressBar.id = 'nav-progress';
+        progressBar.className = 'fixed top-0 left-0 h-0.5 bg-black z-[100] transition-all duration-300 ease-out';
+        progressBar.style.width = '0%';
+        document.body.appendChild(progressBar);
+    }
+    
+    setTimeout(() => progressBar.style.width = '30%', 0);
+    mainContent.style.opacity = '0.5';
+    
+    try {
+        const response = await fetch(url, {
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-SPA': 'true'
+            }
+        });
+        
+        progressBar.style.width = '70%';
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const html = await response.text();
+        
+        if (html.includes('<main')) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            mainContent.innerHTML = doc.querySelector('main').innerHTML;
+            const newTitle = doc.querySelector('title');
+            if (newTitle) document.title = newTitle.innerText;
+            
+            updateSidebarActive(url);
+        } else {
+            mainContent.innerHTML = html;
+        }
+        
+        await executeScripts(mainContent);
+
+        if (push) window.history.pushState({}, '', url);
+        if (resetScroll) mainContent.scrollTop = 0;
+        
+        progressBar.style.width = '100%';
+        
+    } catch (error) {
+        console.error('Navigation failed:', error);
+        if (push) window.location.href = url;
+    } finally {
+        mainContent.style.opacity = '1';
+        setTimeout(() => {
+            if (progressBar) progressBar.style.width = '0%';
+        }, 300);
+    }
+}
+
+async function executeScripts(container) {
+    // Destroy any existing Chart.js instances to prevent "Canvas is already in use" errors
+    if (typeof Chart !== 'undefined' && Chart.instances) {
+        Object.values(Chart.instances).forEach(c => { try { c.destroy(); } catch(e) {} });
+    }
+
+    // Clean up previously injected SPA scripts from body
+    document.querySelectorAll('script[data-spa-injected]').forEach(s => s.remove());
+
+    const scripts = Array.from(container.querySelectorAll('script'));
+    for (const oldScript of scripts) {
+        await new Promise((resolve) => {
+            const newScript = document.createElement('script');
+            newScript.setAttribute('data-spa-injected', 'true');
+            
+            // Copy attributes
+            Array.from(oldScript.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+            
+            if (oldScript.src) {
+                // External script: skip if already loaded globally
+                const alreadyLoaded = document.querySelector(`head script[src="${oldScript.src}"]`);
+                if (alreadyLoaded) { oldScript.remove(); resolve(); return; }
+                newScript.onload = resolve;
+                newScript.onerror = resolve;
+                oldScript.remove();
+                document.head.appendChild(newScript);
+            } else {
+                // Inline script: wrap in IIFE to avoid const/let redeclaration errors
+                newScript.textContent = `(function(){${oldScript.textContent}})();`;
+                oldScript.remove();
+                document.body.appendChild(newScript);
+                requestAnimationFrame(() => setTimeout(resolve, 0));
+            }
+        });
+    }
+}
+
+function updateSidebarActive(currentUrl) {
+    const path = new URL(currentUrl, window.location.origin).pathname;
+    
+    // Handle main links
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        if (link.tagName === 'A') {
+            const linkPath = new URL(link.href, window.location.origin).pathname;
+            link.classList.toggle('active', linkPath === path);
+        }
+    });
+
+    // Handle sub-links
+    document.querySelectorAll('nav a:not(.sidebar-link)').forEach(link => {
+        const linkPath = new URL(link.href, window.location.origin).pathname;
+        if (linkPath === path) {
+            link.classList.replace('text-gray-400', 'text-black');
+            link.classList.add('font-black');
+        } else {
+            link.classList.replace('text-black', 'text-gray-400');
+            link.classList.remove('font-black');
+        }
+    });
+}
+</script>
 
 
 <script>
@@ -511,15 +743,7 @@ function notificationCenter() {
         },
 
         iconBg(type) {
-            const map = {
-                inventory_low:  'bg-amber-100 text-amber-600',
-                inventory_out:  'bg-red-100 text-red-600',
-                new_sale:       'bg-emerald-100 text-emerald-600',
-                new_order:      'bg-blue-100 text-blue-600',
-                order_approved: 'bg-violet-100 text-violet-600',
-                new_reseller:   'bg-indigo-100 text-indigo-600',
-            };
-            return map[type] || 'bg-gray-100 text-gray-500';
+            return 'bg-black text-white shadow-lg shadow-black/10';
         },
 
         iconSvg(type) {
@@ -540,4 +764,5 @@ function notificationCenter() {
 
 </body>
 </html>
+<?php endif; ?>
 <?php /**PATH C:\Users\USER\Documents\Project Code\rpims\resources\views/layouts/app.blade.php ENDPATH**/ ?>

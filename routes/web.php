@@ -63,9 +63,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'update'])->name('orders.update');
     
+    // Scanner & POS
+    Route::get('/inventory/scan-in', [\App\Http\Controllers\Admin\InventoryScannerController::class, 'index'])->name('inventory.scan-in');
+    Route::post('/inventory/scan-in', [\App\Http\Controllers\Admin\InventoryScannerController::class, 'restock']);
+    Route::get('/sales/pos', [\App\Http\Controllers\Admin\POSController::class, 'create'])->name('sales.pos');
+    Route::post('/sales/pos', [\App\Http\Controllers\Admin\POSController::class, 'store']);
+    
+    // API Route for admin scanning lookups
+    Route::get('/api/scan/{sku}', [\App\Http\Controllers\ScannerController::class, 'lookup'])->name('api.scan');
+    
     // Storefront Settings
     Route::get('/settings/{page?}', [\App\Http\Controllers\Admin\SettingsController::class, 'showPage'])->name('settings.page');
     Route::post('/settings/global-promotion', [\App\Http\Controllers\Admin\SettingsController::class, 'globalPromotion'])->name('settings.globalPromotion');
+    Route::post('/settings/global-promotion/end', [\App\Http\Controllers\Admin\SettingsController::class, 'endGlobalSale'])->name('settings.endGlobalSale');
+    Route::post('/settings/promotion/remove/{product}', [\App\Http\Controllers\Admin\SettingsController::class, 'removeProductPromotion'])->name('settings.removeProductPromotion');
+    Route::get('/api/products/search', [\App\Http\Controllers\Admin\SettingsController::class, 'searchProducts'])->name('api.products.search');
     Route::post('/settings/{page}', [\App\Http\Controllers\Admin\SettingsController::class, 'updatePage'])->name('settings.page.update');
     
     Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');

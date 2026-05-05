@@ -16,7 +16,8 @@
         variants: <?php echo \Illuminate\Support\Js::from($product->variants)->toHtml() ?>,
         get selectedVariant() {
             return this.variants.find(v => v.id === this.selectedVariantId) || null;
-        }
+        },
+        lowStockThreshold: 15
     }">
         <div class="max-w-[1600px] mx-auto w-full px-6 sm:px-8 lg:px-12 pb-16">
             <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
@@ -129,13 +130,16 @@
                     <div class="pb-6 border-b border-gray-100/50">
                         <div class="flex items-center gap-2 mb-3">
                             <?php if($product->release_date && $product->release_date >= now()->subMonths(3)): ?>
-                                <span class="px-2 py-0.5 bg-gray-900 text-white text-[8px] font-black uppercase tracking-widest rounded-full">New Arrival</span>
+                                <span class="px-3 py-1 bg-black text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-full shadow-xl shadow-black/20 border border-white/10">New Arrival</span>
                             <?php endif; ?>
                             <?php if($product->sales_sum_quantity && $product->sales_sum_quantity > 10): ?>
                                 <span class="px-3 py-1 bg-black text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-black/10">Best Seller</span>
                             <?php endif; ?>
-                            <?php if($product->promotion_badge): ?>
-                                <span class="px-3 py-1 bg-amber-400 text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-amber-400/20"><?php echo e($product->promotion_badge); ?></span>
+                            <?php if($product->effective_promotion_badge): ?>
+                                <span class="px-3 py-1 bg-amber-400 text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-amber-400/20">
+                                    <?php echo e($product->effective_promotion_badge); ?>
+
+                                </span>
                             <?php endif; ?>
                         </div>
 
@@ -153,10 +157,16 @@
                             </span>
                         </div>
 
-                        <div class="flex items-baseline gap-4 mb-3">
-                            <span class="text-xl font-black text-black tracking-widest uppercase">
-                                RM <span x-text="selectedVariant ? Number(selectedVariant.retail_price).toFixed(2) : '<?php echo e(number_format($product->retail_price, 2)); ?>'"></span>
-                            </span>
+
+
+                        <div class="flex flex-col gap-1 mb-3">
+                            <div class="flex items-baseline gap-4">
+                                <span class="text-xl font-black text-black tracking-widest uppercase">
+                                    RM <span x-text="selectedVariant ? Number(selectedVariant.retail_price).toFixed(2) : '<?php echo e(number_format($product->retail_price, 2)); ?>'"></span>
+                                </span>
+                            </div>
+                            
+
                         </div>
 
                         <div class="mb-4">
@@ -180,6 +190,11 @@
                                     <span x-text="selectedVariant && selectedVariant.stock > 0 ? 'In stock' : 'Currently Unavailable'"></span>
                                 </span>
                             </div>
+                            <template x-if="selectedVariant && selectedVariant.stock > 0 && selectedVariant.stock <= lowStockThreshold">
+                                <span class="px-3 py-1 bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-red-100 animate-pulse">
+                                    Only <span x-text="selectedVariant.stock"></span> left
+                                </span>
+                            </template>
                         </div>
                     </div>
                     

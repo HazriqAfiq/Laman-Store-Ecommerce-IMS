@@ -8,9 +8,14 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('user')->latest()->paginate(15);
+        $orders = Order::with('user')->latest()->paginate(15)->appends($request->all());
+        
+        if ($request->ajax() && !$request->header('X-SPA')) {
+            return view('admin.orders.partials.table', compact('orders'))->render();
+        }
+
         return view('admin.orders.index', compact('orders'));
     }
 

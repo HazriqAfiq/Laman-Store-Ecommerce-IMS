@@ -157,10 +157,10 @@
                                             <p class="text-2xl font-light text-gray-900 tracking-tighter">RM {{ number_format($topMatch->retail_price, 2) }}</p>
                                         </div>
                                         
-                                        <a href="{{ route('storefront.show', $topMatch->slug) }}" 
-                                           class="bg-black text-white px-10 py-4 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 transition-all duration-500 shadow-xl hover:shadow-2xl hover:translate-y-[-2px] active:scale-95 whitespace-nowrap">
-                                            Experience Now
-                                        </a>
+                                         <a href="{{ route('storefront.show', $topMatch->slug) }}" 
+                                            class="bg-black text-white px-10 py-4 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-gray-900 transition-all duration-500 shadow-xl hover:shadow-2xl hover:translate-y-[-2px] active:scale-95 whitespace-nowrap">
+                                             {{ \App\Models\Setting::getValue('scent_finder_cta_text', 'Experience Now') }}
+                                         </a>
                                     </div>
 
                                     <div class="text-left">

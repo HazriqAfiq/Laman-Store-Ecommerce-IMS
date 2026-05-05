@@ -45,7 +45,7 @@
 
     /* ── Page Titles (24–28px) ───────────────── */
     .type-page-title {
-        @apply text-2xl sm:text-3xl font-black text-gray-900 tracking-tight leading-snug;
+        @apply text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-snug;
     }
 
     /* ── Section Titles (18–20px) ────────────── */
@@ -60,7 +60,7 @@
 
     /* ── Card Subtitles ──────────────────────── */
     .type-card-subtitle {
-        @apply text-[11px] font-bold text-gray-400 uppercase tracking-widest;
+        @apply text-xs font-semibold text-gray-500 uppercase tracking-wider;
     }
 
     /* ── Body Text (14–15px) ─────────────────── */
@@ -75,7 +75,7 @@
 
     /* ── Labels & Captions (12–13px) ─────────── */
     .type-label {
-        @apply text-[10px] font-black text-gray-400 uppercase tracking-widest;
+        @apply text-xs font-bold text-gray-400 uppercase tracking-wider;
     }
     .type-caption {
         @apply text-[12px] font-medium text-gray-400 leading-snug;
@@ -83,18 +83,18 @@
 
     /* ── KPI / Metric Values (24–32px) ──────── */
     .type-metric {
-        @apply text-2xl sm:text-3xl font-black text-gray-900 tracking-tight leading-none;
+        @apply text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-none;
     }
     .type-metric-sm {
-        @apply text-xl font-black text-gray-900 tracking-tight leading-none;
+        @apply text-xl font-bold text-gray-900 tracking-tight leading-none;
     }
     .type-metric-label {
-        @apply text-[11px] font-bold text-gray-400 uppercase tracking-wider;
+        @apply text-xs font-semibold text-gray-400 uppercase tracking-wider;
     }
 
     /* ── Table Headers (11px) ────────────────── */
     .type-table-header {
-        @apply text-[10px] font-black text-gray-400 uppercase tracking-widest;
+        @apply text-xs font-bold text-gray-400 uppercase tracking-wider;
     }
 
     /* ── Table Cells (13–14px) ───────────────── */
@@ -110,7 +110,7 @@
         @apply text-[14px] sm:text-[15px] font-bold text-gray-900 tracking-tight;
     }
     .type-chart-label {
-        @apply text-[11px] font-semibold text-gray-500 uppercase tracking-widest;
+        @apply text-xs font-semibold text-gray-500 uppercase tracking-wider;
     }
 
     /* ── Badge / Status Text ─────────────────── */
@@ -120,7 +120,7 @@
 
     /* ── Navigation Labels ───────────────────── */
     .type-nav-section {
-        @apply text-[10px] font-black text-gray-400 uppercase tracking-widest;
+        @apply text-xs font-bold text-gray-400 uppercase tracking-widest;
     }
     .type-nav-link {
         @apply text-[13px] font-bold;
@@ -129,18 +129,21 @@
     /* ══ Sidebar links ═══════════════════════ */
     .sidebar-link {
         @apply flex items-center gap-3.5 px-4 py-3 rounded-xl
-               text-[13px] font-bold text-gray-500
-               hover:bg-gray-50/80 hover:text-gray-900
-               transition-all duration-200;
+               text-sm font-bold text-gray-400
+               hover:bg-gray-50 hover:text-black
+               transition-all duration-300;
     }
     .sidebar-link.active {
-        @apply bg-blue-50/60 text-blue-700 shadow-sm border border-blue-100/50;
+        @apply bg-black text-white shadow-lg shadow-black/20 font-bold;
     }
     .sidebar-link svg {
-        @apply w-5 h-5 shrink-0 text-gray-400 group-hover:text-blue-500 transition-colors duration-200;
+        @apply w-4 h-4 shrink-0 text-gray-400 transition-colors duration-300;
+    }
+    .sidebar-link:hover svg {
+        @apply text-black;
     }
     .sidebar-link.active svg {
-        @apply text-blue-600;
+        @apply text-white;
     }
 
     /* ══ Responsive table wrapper ════════════ */
