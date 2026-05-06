@@ -7,6 +7,7 @@
     <header class="relative h-[40vh] min-h-[350px] flex flex-col items-center justify-center overflow-hidden bg-black text-white">
         <!-- Cinematic Scrim System -->
         <div class="absolute inset-0 z-[1] bg-black/40"></div>
+        <div class="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-black/90 via-black/10 to-transparent z-[2]"></div> <!-- Top Scrim -->
         <div class="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-black/90 via-black/40 to-transparent z-[2]"></div>
 
         <!-- Background Image -->

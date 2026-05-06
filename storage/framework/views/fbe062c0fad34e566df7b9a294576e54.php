@@ -24,14 +24,7 @@
         </div>
     </div>
 
-    <?php if(session('success')): ?>
-        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fade-in-up">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider"><?php echo e(session('success')); ?></p>
-        </div>
-    <?php endif; ?>
+
 
     <!-- KPI Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">

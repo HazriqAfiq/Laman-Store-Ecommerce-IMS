@@ -60,6 +60,7 @@
                 <img src="{{ str_contains($heroImage, 'http') ? $heroImage : asset('storage/' . $heroImage) }}" 
                      class="w-full h-full object-cover animate-zoom-slow opacity-60" alt="Discovery Journey">
                 <div class="absolute inset-0 bg-black/40"></div>
+                <div class="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-black/95 via-black/30 to-transparent"></div> <!-- Top Scrim -->
                 <div class="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#050505] via-transparent to-black/20"></div>
             </div>
 

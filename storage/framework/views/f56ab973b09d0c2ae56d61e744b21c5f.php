@@ -1,6 +1,64 @@
 <?php if(request()->ajax()): ?>
     <title><?php echo e(isset($title) ? $title . ' — ' : ''); ?>Laman Store · RPIMS</title>
     <main id="main-content">
+        <?php if(session('success')): ?>
+            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" 
+                 class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 animate-bounce">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Success</p>
+                        <p class="text-xs text-emerald-700 mt-0.5 font-medium"><?php echo e(session('success')); ?></p>
+                    </div>
+                </div>
+                <button @click="show = false" class="text-emerald-400 hover:text-emerald-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        <?php endif; ?>
+
+        <?php if(session('error')): ?>
+            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+                 class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-rose-900 uppercase tracking-wider">Error</p>
+                        <p class="text-xs text-rose-700 mt-0.5 font-medium"><?php echo e(session('error')); ?></p>
+                    </div>
+                </div>
+                <button @click="show = false" class="text-rose-400 hover:text-rose-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        <?php endif; ?>
+
+        <?php if($errors->any()): ?>
+            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 6000)" 
+                 class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-rose-900 uppercase tracking-wider">Validation Error</p>
+                        <ul class="list-disc list-inside text-xs text-rose-700 mt-1 space-y-0.5 font-medium">
+                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li><?php echo e($error); ?></li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </ul>
+                    </div>
+                </div>
+                <button @click="show = false" class="text-rose-400 hover:text-rose-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        <?php endif; ?>
+
         <?php echo e($slot); ?>
 
     </main>
@@ -55,14 +113,29 @@
         <div class="h-16 lg:h-24 flex items-center justify-center px-5 lg:px-7 border-b border-gray-50 shrink-0 relative z-10">
             <a href="<?php echo e(Auth::check() && Auth::user()->isAdmin() ? route('admin.dashboard') : (Auth::check() ? route('reseller.dashboard') : '/')); ?>"
                class="flex items-center gap-3 transition-transform hover:scale-[1.02]">
-                <div class="w-9 h-9 rounded-xl bg-black shadow-lg shadow-black/10 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                    </svg>
-                </div>
-                <div>
-                    <p class="text-[15px] font-black text-gray-900 leading-none tracking-tight">LAMAN</p>
-                    <p class="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] leading-none mt-1.5">STORE</p>
+                <?php
+                    $logoPath = \App\Models\Setting::getValue('brand_logo');
+                    $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                ?>
+                <?php if($logoPath && Storage::disk('public')->exists($logoPath)): ?>
+                    <img src="<?php echo e(asset('storage/' . $logoPath)); ?>" 
+                         alt="<?php echo e($brandName); ?>" 
+                         class="max-h-10 w-auto object-contain">
+                <?php else: ?>
+                    <div class="w-9 h-9 rounded-xl bg-black shadow-lg shadow-black/10 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                    </div>
+                <?php endif; ?>
+                <div class="min-w-0">
+                    <?php
+                        $parts = explode(' ', $brandName, 2);
+                        $part1 = $parts[0] ?? 'LAMAN';
+                        $part2 = $parts[1] ?? 'STORE';
+                    ?>
+                    <p class="text-[14px] font-black text-gray-900 leading-none tracking-tight uppercase truncate"><?php echo e($part1); ?></p>
+                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] leading-none mt-1.5 truncate"><?php echo e($part2); ?></p>
                 </div>
             </a>
             <!-- Close button (mobile only) — absolute so it doesn't affect logo centering -->
@@ -256,19 +329,23 @@
 
             
             <a href="<?php echo e(Auth::check() && Auth::user()->isAdmin() ? route('admin.dashboard') : (Auth::check() ? route('reseller.dashboard') : '/')); ?>"
-               class="lg:hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-                <img src="<?php echo e(asset('storage/branding/logo.png')); ?>"
-                     alt="Laman Store"
-                     class="h-8 w-auto object-contain drop-shadow-sm"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="hidden items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-black flex items-center justify-center shadow-lg shadow-black/10">
+               class="lg:hidden absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <?php
+                    $logoPath = \App\Models\Setting::getValue('brand_logo');
+                    $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                ?>
+                <?php if($logoPath && Storage::disk('public')->exists($logoPath)): ?>
+                    <img src="<?php echo e(asset('storage/' . $logoPath)); ?>"
+                         alt="<?php echo e($brandName); ?>"
+                         class="h-8 w-auto object-contain drop-shadow-sm">
+                <?php else: ?>
+                    <div class="w-7 h-7 rounded-lg bg-black flex items-center justify-center shadow-lg shadow-black/10 shrink-0">
                         <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
                         </svg>
                     </div>
-                    <span class="text-[13px] font-black text-gray-900 tracking-tight">LAMAN STORE</span>
-                </div>
+                <?php endif; ?>
+                <span class="text-[13px] font-black text-gray-900 tracking-tight uppercase truncate max-w-[120px]"><?php echo e($brandName); ?></span>
             </a>
 
             <div class="flex items-center gap-2 md:gap-4">
@@ -415,6 +492,64 @@
 
         
         <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <?php if(session('success')): ?>
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" 
+                     class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 animate-bounce">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Success</p>
+                            <p class="text-xs text-emerald-700 mt-0.5 font-medium"><?php echo e(session('success')); ?></p>
+                        </div>
+                    </div>
+                    <button @click="show = false" class="text-emerald-400 hover:text-emerald-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            <?php endif; ?>
+
+            <?php if(session('error')): ?>
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+                     class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-rose-900 uppercase tracking-wider">Error</p>
+                            <p class="text-xs text-rose-700 mt-0.5 font-medium"><?php echo e(session('error')); ?></p>
+                        </div>
+                    </div>
+                    <button @click="show = false" class="text-rose-400 hover:text-rose-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            <?php endif; ?>
+
+            <?php if($errors->any()): ?>
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 6000)" 
+                     class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-between gap-3 animate-fade-in-up shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-rose-900 uppercase tracking-wider">Validation Error</p>
+                            <ul class="list-disc list-inside text-xs text-rose-700 mt-1 space-y-0.5 font-medium">
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li><?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                        </div>
+                    </div>
+                    <button @click="show = false" class="text-rose-400 hover:text-rose-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            <?php endif; ?>
+
             <?php echo e($slot); ?>
 
         </main>
@@ -476,8 +611,22 @@ document.addEventListener('submit', async (e) => {
         });
 
         if (response.redirected) {
-            const isSamePage = new URL(response.url).pathname === window.location.pathname;
-            navigateTo(response.url, true, !isSamePage);
+            const html = await response.text();
+            
+            if (html.includes('<main')) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                mainContent.innerHTML = doc.querySelector('main').innerHTML;
+                const newTitle = doc.querySelector('title');
+                if (newTitle) document.title = newTitle.innerText;
+            } else {
+                mainContent.innerHTML = html;
+            }
+
+            await executeScripts(mainContent);
+            window.history.pushState({}, '', response.url);
+            updateSidebarActive(response.url);
+            mainContent.scrollTop = 0;
             return;
         }
 

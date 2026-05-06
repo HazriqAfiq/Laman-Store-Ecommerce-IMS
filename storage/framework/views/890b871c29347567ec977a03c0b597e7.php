@@ -17,14 +17,7 @@
         </div>
     </div>
 
-    <?php if(session('success')): ?>
-        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fade-in-up">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider"><?php echo e(session('success')); ?></p>
-        </div>
-    <?php endif; ?>
+
 
     <?php
         $updateRoute = isset($page) ? route('admin.settings.page.update', $page) : route('admin.settings.update');
@@ -112,6 +105,25 @@
                                                 <input type="color" name="<?php echo e($setting->key); ?>" value="<?php echo e($setting->value); ?>" class="h-10 w-16 rounded-lg border-gray-100 cursor-pointer">
                                                 <input type="text" value="<?php echo e($setting->value); ?>" readonly class="bg-transparent border-none text-[10px] font-bold text-gray-900 w-24 focus:ring-0 uppercase tracking-widest">
                                             </div>
+                                        <?php elseif($setting->type === 'select'): ?>
+                                            <?php if($setting->key === 'brand_logo_style'): ?>
+                                                <select name="<?php echo e($setting->key); ?>" id="<?php echo e($setting->key); ?>"
+                                                        class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">
+                                                    <option value="both" <?php echo e(old($setting->key, $setting->value) === 'both' ? 'selected' : ''); ?>>Both (Logo & Text)</option>
+                                                    <option value="logo" <?php echo e(old($setting->key, $setting->value) === 'logo' ? 'selected' : ''); ?>>Logo Only</option>
+                                                    <option value="text" <?php echo e(old($setting->key, $setting->value) === 'text' ? 'selected' : ''); ?>>Text Only</option>
+                                                </select>
+                                            <?php elseif($setting->key === 'theme_typography_pairing'): ?>
+                                                <select name="<?php echo e($setting->key); ?>" id="<?php echo e($setting->key); ?>"
+                                                        class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">
+                                                    <option value="classic" <?php echo e(old($setting->key, $setting->value) === 'classic' ? 'selected' : ''); ?>>Classic Serif / Sans</option>
+                                                    <option value="modern" <?php echo e(old($setting->key, $setting->value) === 'modern' ? 'selected' : ''); ?>>Modern Minimalist</option>
+                                                    <option value="editorial" <?php echo e(old($setting->key, $setting->value) === 'editorial' ? 'selected' : ''); ?>>Editorial Luxury</option>
+                                                </select>
+                                            <?php else: ?>
+                                                <input type="text" name="<?php echo e($setting->key); ?>" id="<?php echo e($setting->key); ?>" value="<?php echo e(old($setting->key, $setting->value)); ?>"
+                                                       class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <input type="text" name="<?php echo e($setting->key); ?>" id="<?php echo e($setting->key); ?>" value="<?php echo e(old($setting->key, $setting->value)); ?>"
                                                    class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">

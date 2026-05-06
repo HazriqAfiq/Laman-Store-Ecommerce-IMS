@@ -1,14 +1,6 @@
 <x-app-layout title="My Sales">
 
-    {{-- Success notice --}}
-    @if(session('success'))
-        <div class="mb-6 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-bold px-4 py-3 rounded-xl shadow-sm">
-            <svg class="w-5 h-5 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-            {{ session('success') }}
-        </div>
-    @endif
+
 
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">

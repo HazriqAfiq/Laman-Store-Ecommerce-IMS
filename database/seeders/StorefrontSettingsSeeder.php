@@ -55,6 +55,8 @@ class StorefrontSettingsSeeder extends Seeder
             ['key' => 'philosophy_title', 'value' => 'Our Philosophy', 'type' => 'text', 'group' => 'philosophy'],
             ['key' => 'philosophy_quote', 'value' => 'Fragrances are not just scents, they are stories bottled in glass, waiting to be told across your skin.', 'type' => 'textarea', 'group' => 'philosophy'],
             ['key' => 'philosophy_link_text', 'value' => 'Our Heritage', 'type' => 'text', 'group' => 'philosophy'],
+            ['key' => 'brand_logo', 'value' => 'branding/logo.png', 'type' => 'image', 'group' => 'branding'],
+            ['key' => 'brand_logo_style', 'value' => 'both', 'type' => 'select', 'group' => 'branding'],
             ['key' => 'footer_story', 'value' => 'Join our community for early access to exclusive promotions, seasonal sales, and the art of fine fragrance.', 'type' => 'textarea', 'group' => 'branding'],
             ['key' => 'theme_typography_pairing', 'value' => 'classic', 'type' => 'select', 'group' => 'appearance'],
             ['key' => 'homepage_hero_scrim', 'value' => '0.3', 'type' => 'text', 'group' => 'appearance'],

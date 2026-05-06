@@ -14,17 +14,7 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="mb-10 p-5 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-start gap-4">
-                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100 shrink-0">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-emerald-900">Order successfully recorded</h3>
-                    <p class="mt-0.5 text-xs text-emerald-600 font-medium">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
+
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <!-- Header Section -->

@@ -200,7 +200,7 @@
     @endphp
 
     @if($announcementEnabled && !$announcementSticky)
-        <div class="bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase text-center py-2.5 relative w-full z-[60]">
+        <div class="bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase flex items-center justify-center h-10 relative w-full z-[60]">
             {{ \App\Models\Setting::getValue('announcement_bar_text', '') }}
         </div>
     @endif
@@ -224,7 +224,7 @@
             :style="(scrolled || !@json($announcementEnabled) || @json($announcementSticky)) ? 'top: 0' : 'top: 40px'">
         
         @if($announcementEnabled && $announcementSticky)
-            <div class="bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase text-center py-2.5 relative w-full z-[60]">
+            <div class="bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase flex items-center justify-center h-10 relative w-full z-[60]">
                 {{ \App\Models\Setting::getValue('announcement_bar_text', '') }}
             </div>
         @endif
@@ -260,9 +260,23 @@
                 <!-- Logo (Center on mobile, Left on desktop) -->
                 <div class="flex-shrink-0 absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
                     <a href="{{ route('storefront.index') }}" 
-                       class="text-xl md:text-3xl font-serif tracking-tight transition-all duration-500 uppercase whitespace-nowrap"
-                       :class="{ 'text-gray-800': scrolled || !@json($isMenuPage) || !@json($darkHero ?? false), 'text-white': !scrolled && @json($isMenuPage) && @json($darkHero ?? false) }">
-                        {{ \App\Models\Setting::getValue('brand_name', 'Laman Store') }}
+                       class="flex items-center gap-3 transition-all duration-500">
+                        @php
+                            $logoPath = \App\Models\Setting::getValue('brand_logo');
+                            $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                            $logoStyle = \App\Models\Setting::getValue('brand_logo_style', 'both');
+                        @endphp
+                        @if(($logoStyle === 'logo' || $logoStyle === 'both') && $logoPath && Storage::disk('public')->exists($logoPath))
+                            <img src="{{ asset('storage/' . $logoPath) }}" 
+                                 alt="{{ $brandName }}" 
+                                 class="h-8 md:h-12 w-auto object-contain transition-all duration-500">
+                        @endif
+                        @if($logoStyle === 'text' || $logoStyle === 'both' || !($logoPath && Storage::disk('public')->exists($logoPath)))
+                            <span class="text-xl md:text-3xl font-serif tracking-tight uppercase whitespace-nowrap transition-all duration-500"
+                                  :class="{ 'text-gray-800': scrolled || !@json($isMenuPage) || !@json($darkHero ?? false), 'text-white': !scrolled && @json($isMenuPage) && @json($darkHero ?? false) }">
+                                {{ $brandName }}
+                            </span>
+                        @endif
                     </a>
                 </div>
 
@@ -386,7 +400,21 @@
                     <div class="flex h-full flex-col overflow-y-auto bg-white shadow-2xl">
                         <!-- Header -->
                         <div class="px-8 pt-10 pb-8 flex items-center justify-between border-b border-gray-50">
-                            <h2 class="text-lg font-serif italic tracking-tight uppercase">{{ \App\Models\Setting::getValue('brand_name', 'Laman') }}</h2>
+                            <div class="flex items-center gap-3">
+                                @php
+                                    $logoPath = \App\Models\Setting::getValue('brand_logo');
+                                    $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                                    $logoStyle = \App\Models\Setting::getValue('brand_logo_style', 'both');
+                                @endphp
+                                @if(($logoStyle === 'logo' || $logoStyle === 'both') && $logoPath && Storage::disk('public')->exists($logoPath))
+                                    <img src="{{ asset('storage/' . $logoPath) }}" 
+                                         alt="{{ $brandName }}" 
+                                         class="h-8 w-auto object-contain">
+                                @endif
+                                @if($logoStyle === 'text' || $logoStyle === 'both' || !($logoPath && Storage::disk('public')->exists($logoPath)))
+                                    <h2 class="text-lg font-serif italic tracking-tight uppercase">{{ $brandName }}</h2>
+                                @endif
+                            </div>
                             <button @click="mobileMenu = false" class="p-2 text-gray-400 hover:text-black transition-colors">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

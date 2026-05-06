@@ -5,6 +5,7 @@
     <section class="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-black text-white">
         <!-- Cinematic Scrim System -->
         <div class="hero-scrim z-[1]"></div> <!-- Global Tint -->
+        <div class="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-black/90 via-black/10 to-transparent z-[2]"></div> <!-- Top Scrim -->
         <div class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-[2]"></div> <!-- Bottom Scrim -->
 
         <!-- Background Scaling Image -->

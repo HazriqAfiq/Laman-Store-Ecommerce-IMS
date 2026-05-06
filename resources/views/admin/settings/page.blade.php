@@ -8,14 +8,7 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fade-in-up">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider">{{ session('success') }}</p>
-        </div>
-    @endif
+
 
     @php
         $updateRoute = isset($page) ? route('admin.settings.page.update', $page) : route('admin.settings.update');
@@ -64,6 +57,25 @@
                                                 <input type="color" name="{{ $setting->key }}" value="{{ $setting->value }}" class="h-10 w-16 rounded-lg border-gray-100 cursor-pointer">
                                                 <input type="text" value="{{ $setting->value }}" readonly class="bg-transparent border-none text-[10px] font-bold text-gray-900 w-24 focus:ring-0 uppercase tracking-widest">
                                             </div>
+                                        @elseif($setting->type === 'select')
+                                            @if($setting->key === 'brand_logo_style')
+                                                <select name="{{ $setting->key }}" id="{{ $setting->key }}"
+                                                        class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">
+                                                    <option value="both" {{ old($setting->key, $setting->value) === 'both' ? 'selected' : '' }}>Both (Logo & Text)</option>
+                                                    <option value="logo" {{ old($setting->key, $setting->value) === 'logo' ? 'selected' : '' }}>Logo Only</option>
+                                                    <option value="text" {{ old($setting->key, $setting->value) === 'text' ? 'selected' : '' }}>Text Only</option>
+                                                </select>
+                                            @elseif($setting->key === 'theme_typography_pairing')
+                                                <select name="{{ $setting->key }}" id="{{ $setting->key }}"
+                                                        class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">
+                                                    <option value="classic" {{ old($setting->key, $setting->value) === 'classic' ? 'selected' : '' }}>Classic Serif / Sans</option>
+                                                    <option value="modern" {{ old($setting->key, $setting->value) === 'modern' ? 'selected' : '' }}>Modern Minimalist</option>
+                                                    <option value="editorial" {{ old($setting->key, $setting->value) === 'editorial' ? 'selected' : '' }}>Editorial Luxury</option>
+                                                </select>
+                                            @else
+                                                <input type="text" name="{{ $setting->key }}" id="{{ $setting->key }}" value="{{ old($setting->key, $setting->value) }}"
+                                                       class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">
+                                            @endif
                                         @else
                                             <input type="text" name="{{ $setting->key }}" id="{{ $setting->key }}" value="{{ old($setting->key, $setting->value) }}"
                                                    class="w-full px-4 py-3 text-sm font-bold text-gray-900 bg-gray-50 border border-gray-100 rounded-xl focus:ring-0 focus:border-black transition-all">

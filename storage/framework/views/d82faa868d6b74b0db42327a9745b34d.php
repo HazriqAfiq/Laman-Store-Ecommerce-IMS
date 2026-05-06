@@ -290,10 +290,24 @@ unset($__defined_vars, $__key, $__value); ?>
                 <!-- Logo (Center on mobile, Left on desktop) -->
                 <div class="flex-shrink-0 absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
                     <a href="<?php echo e(route('storefront.index')); ?>" 
-                       class="text-xl md:text-3xl font-serif tracking-tight transition-all duration-500 uppercase whitespace-nowrap"
-                       :class="{ 'text-gray-800': scrolled || !<?php echo json_encode($isMenuPage, 15, 512) ?> || !<?php echo json_encode($darkHero ?? false, 15, 512) ?>, 'text-white': !scrolled && <?php echo json_encode($isMenuPage, 15, 512) ?> && <?php echo json_encode($darkHero ?? false, 15, 512) ?> }">
-                        <?php echo e(\App\Models\Setting::getValue('brand_name', 'Laman Store')); ?>
+                       class="flex items-center gap-3 transition-all duration-500">
+                        <?php
+                            $logoPath = \App\Models\Setting::getValue('brand_logo');
+                            $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                            $logoStyle = \App\Models\Setting::getValue('brand_logo_style', 'both');
+                        ?>
+                        <?php if(($logoStyle === 'logo' || $logoStyle === 'both') && $logoPath && Storage::disk('public')->exists($logoPath)): ?>
+                            <img src="<?php echo e(asset('storage/' . $logoPath)); ?>" 
+                                 alt="<?php echo e($brandName); ?>" 
+                                 class="h-8 md:h-12 w-auto object-contain transition-all duration-500">
+                        <?php endif; ?>
+                        <?php if($logoStyle === 'text' || $logoStyle === 'both' || !($logoPath && Storage::disk('public')->exists($logoPath))): ?>
+                            <span class="text-xl md:text-3xl font-serif tracking-tight uppercase whitespace-nowrap transition-all duration-500"
+                                  :class="{ 'text-gray-800': scrolled || !<?php echo json_encode($isMenuPage, 15, 512) ?> || !<?php echo json_encode($darkHero ?? false, 15, 512) ?>, 'text-white': !scrolled && <?php echo json_encode($isMenuPage, 15, 512) ?> && <?php echo json_encode($darkHero ?? false, 15, 512) ?> }">
+                                <?php echo e($brandName); ?>
 
+                            </span>
+                        <?php endif; ?>
                     </a>
                 </div>
 
@@ -418,7 +432,21 @@ unset($__defined_vars, $__key, $__value); ?>
                     <div class="flex h-full flex-col overflow-y-auto bg-white shadow-2xl">
                         <!-- Header -->
                         <div class="px-8 pt-10 pb-8 flex items-center justify-between border-b border-gray-50">
-                            <h2 class="text-lg font-serif italic tracking-tight uppercase"><?php echo e(\App\Models\Setting::getValue('brand_name', 'Laman')); ?></h2>
+                            <div class="flex items-center gap-3">
+                                <?php
+                                    $logoPath = \App\Models\Setting::getValue('brand_logo');
+                                    $brandName = \App\Models\Setting::getValue('brand_name', 'Laman Store');
+                                    $logoStyle = \App\Models\Setting::getValue('brand_logo_style', 'both');
+                                ?>
+                                <?php if(($logoStyle === 'logo' || $logoStyle === 'both') && $logoPath && Storage::disk('public')->exists($logoPath)): ?>
+                                    <img src="<?php echo e(asset('storage/' . $logoPath)); ?>" 
+                                         alt="<?php echo e($brandName); ?>" 
+                                         class="h-8 w-auto object-contain">
+                                <?php endif; ?>
+                                <?php if($logoStyle === 'text' || $logoStyle === 'both' || !($logoPath && Storage::disk('public')->exists($logoPath))): ?>
+                                    <h2 class="text-lg font-serif italic tracking-tight uppercase"><?php echo e($brandName); ?></h2>
+                                <?php endif; ?>
+                            </div>
                             <button @click="mobileMenu = false" class="p-2 text-gray-400 hover:text-black transition-colors">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
